@@ -16,15 +16,21 @@ import Fab from "@mui/material/Fab";
 export default function CatalogCard({ name, price, img, chip }) {
     return (
         <Card
-            sx={{ width: { xs: 130, sm: 150, md: 170, lg: 200 } }}
+            sx={{
+                width: { xs: 130, sm: 150, md: 170, lg: 200 },
+                borderRadius: 4,
+                backgroundImage:
+                    "linear-gradient(rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.17))",
+                border: "1px solid #ebebeb",
+            }}
             elevation={0}
-            variant="outlined"
+            color="grey"
         >
             {/* Картинка */}
             <CardMedia
                 sx={{
                     height: { xs: 130, sm: 150, md: 170, lg: 200 },
-                    borderRadius: 1,
+                    borderRadius: 4,
                 }}
                 image={img}
                 title={name}
@@ -33,7 +39,7 @@ export default function CatalogCard({ name, price, img, chip }) {
             {/* Расширения */}
             <Chip
                 label="Лучшая цена"
-                color="success"
+                color="warning"
                 size="small"
                 sx={{
                     position: "absolute",
@@ -54,21 +60,21 @@ export default function CatalogCard({ name, price, img, chip }) {
                 variant="h7"
                 component="div"
                 sx={{
-					fontSize: {
-						xs:10,
-						sm:13,
-						md:15,
-						lg:17,
-						xl:17
-					},
+                    fontSize: {
+                        xs: 10,
+                        sm: 13,
+                        md: 15,
+                        lg: 17,
+                        xl: 17,
+                    },
                     fontWeight: 600,
                     height: {
-						xs:20,
-						sm:30,
-						md:40,
-						lg:45,
-						xl:45
-					},
+                        xs: 20,
+                        sm: 30,
+                        md: 40,
+                        lg: 45,
+                        xl: 45,
+                    },
                     flexWrap: "wrap",
                     wordWrap: "break-word",
                     lineClamp: 2,
@@ -79,42 +85,6 @@ export default function CatalogCard({ name, price, img, chip }) {
                 {name}awdawdawdawhdy adgyauiduyg ftguhihygtf
             </Typography>
 
-            {/* Описание */}
-            <Grid
-                container
-                sx={{
-                    px: 1,
-                    display: {
-                        xs: "none",
-                        sm: "none",
-                        md: "flex",
-                    },
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Grid
-                    xs={6}
-                    sx={{
-                        fontWeight: 500,
-                        fontSize: 12,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxHeight: 40,
-                    }}
-                    color="text.secondary"
-                >
-                    Махеев
-                </Grid>
-                <Grid
-                    xs={6}
-                    sx={{ fontSize: 12, fontWeight: 600 }}
-                    color="text.secondary"
-                >
-                    300гр
-                </Grid>
-            </Grid>
-
             {/* Кнопки */}
             <Box
                 sx={{
@@ -124,35 +94,29 @@ export default function CatalogCard({ name, price, img, chip }) {
                     gap: 1,
                 }}
             >
-                <Fab
-					variant='extended'
-					size="small"
-                    label={`${price}₽`}
+                <Chip
+                    variant="extended"
+                    size="medium"
                     color="success"
+                    elevation={0}
+                    label={`${price}₽`}
+                    icon={<AddIcon fontSize="small" />}
                     sx={{
                         display: "flex",
                         alignItems: "center",
-                        fontWeight: 800,
+                        fontWeight: 700,
                         flexGrow: 3,
-						fontSize: {
-							xs:10,
-							sm:12,
-							md:13,
-							lg:14,
-							xl:14
-						},
+                        fontSize: {
+                            xs: 14,
+                            sm: 14,
+                            md: 15,
+                            lg: 17,
+                            xl: 17,
+                        },
                     }}
                 >
-					<AddIcon fontSize="small"/>
-					Купить
-				</Fab>
-                {/* <Fab 
-					variant="extended"
-                    color="secondary"
-                    size='small'
-                >
-					<FavoriteIcon sx={{fontSize:15}}/>
-				</Fab> */}
+                    {price}₽
+                </Chip>
             </Box>
         </Card>
     );
