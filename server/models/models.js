@@ -4,14 +4,10 @@ const {DataTypes} = require('sequelize')
 const User = sequelize.define('user', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     password: {type: DataTypes.STRING,allowNull: false},
-    number: {type: DataTypes.STRING, unique:true,allowNull: false}
-},{timestamps: false})
-
-const UserInfo = sequelize.define('user_info', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    FIO: {type: DataTypes.STRING,allowNull: false},
-    address: {type: DataTypes.STRING,allowNull: false},
-    birthdate: {type: DataTypes.DATE,allowNull: false}
+    number: {type: DataTypes.STRING, unique:true,allowNull: false},
+    fio: {type: DataTypes.STRING,allowNull: false},
+    birthdate: {type: DataTypes.DATEONLY,allowNull: false},
+    role:{type:DataTypes.STRING,allowNull: false,defaultValue:'user'}
 },{timestamps: false})
 
 const Cart = sequelize.define('cart', {
@@ -30,7 +26,8 @@ const Manufacturer = sequelize.define('manufacturer', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false},
     logo: {type: DataTypes.STRING, allowNull: false},
-    description: {type: DataTypes.STRING,allowNull: false}
+    description: {type: DataTypes.STRING,allowNull: false},
+    contact: {type: DataTypes.STRING,allowNull: false}
 },{timestamps: false})
 
 const Order = sequelize.define('order', {
@@ -75,9 +72,6 @@ const Status = sequelize.define('status', {
 User.hasOne(Cart)
 Cart.belongsTo(User)
 
-User.hasOne(UserInfo)
-UserInfo.belongsTo(User)
-
 User.hasMany(Rating)
 Rating.belongsTo(User)
 
@@ -110,7 +104,6 @@ OrderProducts.belongsTo(Order)
 
 module.exports = {
     User,
-    UserInfo,
     Cart,
     Category,
     Manufacturer,

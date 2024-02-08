@@ -29,6 +29,17 @@ class CategoryController {
         }
     }
 
+    async getOne(req, res, next) {
+        try {
+            const {id} = req.params
+            const result = await Category.findOne({where:id})
+            return res.json(result)
+        }
+        catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
     async update(req, res, next) {
         try {
             const {id} = req.params

@@ -6,7 +6,7 @@ const ApiError = require('../error/ApiError');
 class ManufacturerController {
     async create(req, res, next) {
         try {
-            const {name,description} = req.body
+            const {name,description,contact} = req.body
             const {logo} = req.files
 
             const fileName = saveImage(logo)
@@ -14,7 +14,8 @@ class ManufacturerController {
             const result = await Manufacturer.create({
                 name:name,
                 logo:fileName,
-                description:description
+                description:description,
+                contact:contact
             })
 
             return res.json(result)
@@ -35,10 +36,23 @@ class ManufacturerController {
         }
     }
 
+    async getOne(req, res, next) {
+        try {
+            const {id} = req.params
+            
+            const result = await Manufacturer.findOne({where:id})
+
+            return res.json(result)
+        }
+        catch (e) {
+            next(ApiError.badRequest(e.message))
+        }
+    }
+
     async update(req, res, next) {
         try {
             const {id} = req.params
-            const {name,description} = req.body
+            const {name,description,contact} = req.body
             const {logo} = req.files
 
             const tmp = await Manufacturer.findOne({where:{id:id}})
@@ -49,6 +63,7 @@ class ManufacturerController {
                 name:name,
                 logo:fileName,
                 description:description,
+                contact:contact
                 },
                 {
                     where:{id:id},
