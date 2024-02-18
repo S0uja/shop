@@ -78,7 +78,11 @@ class UserController {
             const result = await User.findOne({
                 where:{
                     id:id
-                }
+                },
+                include:[
+                    Cart,
+                    Rating
+                ]
             })
 
             return res.json(result)

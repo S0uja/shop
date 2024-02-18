@@ -28,7 +28,6 @@ class ManufacturerController {
     async getAll(req, res, next) {
         try {
             const result = await Manufacturer.findAll()
-
             return res.json(result)
         }
         catch (e) {
@@ -40,7 +39,7 @@ class ManufacturerController {
         try {
             const {id} = req.params
             
-            const result = await Manufacturer.findOne({where:id})
+            const result = await Manufacturer.findOne({where:{id:id}})
 
             return res.json(result)
         }

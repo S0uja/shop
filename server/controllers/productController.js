@@ -1,7 +1,7 @@
 const saveImage = require('../utils/saveImage')
 const deleteImage = require('../utils/deleteImage')
 const sequelize = require('../db')
-const {Product, ProductImages, Rating} = require('../models/models')
+const {Product, ProductImages, Review, OrderProducts} = require('../models/models')
 const ApiError = require('../error/ApiError')
 
 class ProductController {
@@ -22,7 +22,7 @@ class ProductController {
                 structure:structure,
                 weight_volume:weight_volume
             });
-
+            
             if(images){
                 images.forEach(async (img)=>{
                     const fileName = saveImage(img)
@@ -30,7 +30,8 @@ class ProductController {
                 })
             }
             
-            return res.json(result)
+            
+            return res.json(await Product.findOne({where:{id:result.id},include:[ProductImages]}))
         } catch (e) {
             next(ApiError.badRequest(e.message))
         }
@@ -39,31 +40,37 @@ class ProductController {
 
     async getAll(req, res, next) {
         try {
-            let {limit,page} = req.query
+            let {limit,page,sort,sortmode} = req.query
+
+            sort = sort || 'updateAt'
+            sortmode = sortmode || 'asc'
             page = parseInt(page) || 1
             limit = parseInt(limit) || 5
+
             const offset = page * limit - limit
 
             const result = await Product.findAll({
-                limit: limit,
-                offset: offset
-            },
-            {
                 include: [
                     ProductImages,
                     {
-                        model:Rating,
-                        as:'ratings',
-                        attributes: [],
+                        model: Review,
+                        attributes: []
+                    },
+                    {
+                        model: OrderProducts,
+                        attributes: []
                     }
                 ],
                 attributes: {
                     include: [
-                        [sequelize.fn('AVG', sequelize.col('ratings.rate')), 'avgRating'],
+                        [sequelize.literal('(SELECT AVG(rate) FROM reviews WHERE reviews.productId = product.id)'), 'avgReview'],
+                        [sequelize.literal('(SELECT COUNT(*) FROM order_products WHERE order_products.productId = product.id)'), 'orders']
                     ],
                 },
-                group: ['product.id','product_images.id','ratings.id'],
-            })
+                order: [[sort, sortmode]],
+                limit: limit,
+                offset: offset
+            });
 
             return res.json(result)
         } catch (e) {
@@ -79,18 +86,19 @@ class ProductController {
                 where: {id:id},
                 include: [
                     ProductImages,
+                    Review,
                     {
-                        model:Rating,
-                        as:'ratings',
-                        attributes: [],
+                        model:OrderProducts,
+                        attributes:[]
                     }
                 ],
                 attributes: {
                     include: [
-                        [sequelize.fn('AVG', sequelize.col('ratings.rate')), 'avgRating'],
+                        [sequelize.fn('AVG', sequelize.col('reviews.rate')), 'avgReview'],
+                        [sequelize.fn('COUNT', sequelize.col('order_products.id')), 'orders'],
                     ],
                 },
-                group: ['product.id','product_images.id','ratings.id'],
+                group: ['product.id','product_images.id','reviews.id'],
             })
 
             return res.json(result)
@@ -127,7 +135,7 @@ class ProductController {
             if(images){
                 images.forEach(async (img)=>{
                     const fileName = saveImage(img)
-                    await ProductImages.create({filename:fileName,productId:result.id})
+                    await ProductImages.create({filename:fileName,productId:id})
                 })
             }
 
@@ -147,10 +155,11 @@ class ProductController {
     async delete(req, res, next) {
         try {
             const {id} = req.params
-            const tmp = await ProductImages.findOne({where:{productId:id}})
-            const result = Product.destroy({where:{id:id}})
+            const tmp = await ProductImages.findAll({where:{productId:id}})
+            const result = await Product.destroy({where:{id:id}})
             if(tmp){
                 tmp.forEach((img)=>{
+                    ProductImages.destroy({where:{id:img.id}})
                     deleteImage(img.filename)
                 })
             }
