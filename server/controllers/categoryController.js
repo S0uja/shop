@@ -1,94 +1,147 @@
-const saveImage = require('../utils/saveImage')
-const deleteImage = require('../utils/deleteImage')
-const {Category} = require('../models/models')
-const ApiError = require('../error/ApiError');
+const sendResponse = require("../utils/sendResponse");
+const deleteImages = require("../utils/deleteImages");
+const { Category } = require("../models/models");
 
 class CategoryController {
-    async create(req, res, next) {
+    async create(req, res) {
         try {
-            const {parentId,name} = req.body
-            const {img} = req.files
+            const errors = [];
+            const { parentId, name } = req.body;
+            const fileName = req.file?.filename || null;
 
-            const fileName = saveImage(img)
-            
-            const result = await Category.create({parentId,name,img:fileName})
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            if (!fileName) {
+                errors.push("Картинка не загружена");
+            }
+            if (!name) {
+                errors.push("Название не указано");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            const category = await Category.create({
+                parentId: parentId,
+                name: name,
+                filename: fileName,
+            });
+
+            return sendResponse(res, 200, "success", { data: [category] });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         try {
-            const result = await Category.findAll()
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            const errors = [];
+            const categoriesList = await Category.findAll();
+
+            if (!categoriesList) {
+                errors.push("Категории не найдены");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", { data: categoriesList });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getOne(req, res, next) {
+    async getOne(req, res) {
         try {
-            const {id} = req.params
-            const result = await Category.findOne({where:id})
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            const { id } = req.params;
+            const errors = [];
+            const category = await Category.findOne({ where: { id: id } });
+
+            if (!category) {
+                errors.push("Категория не найдена");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", { data: [category] });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async update(req, res, next) {
+    async update(req, res) {
         try {
-            const {id} = req.params
-            const {parentId,name} = req.body
-            const {img} = req.files
+            const errors = [];
+            const { id } = req.params;
+            const { parentId, name } = req.body;
+            const fileName = req?.file?.filename || null;
+            const oldCategory = await Category.findOne({ where: { id: id } });
 
-            const tmp = await Category.findOne({where:{id:id}})
-            const fileName = saveImage(img)
+            if (!oldCategory) {
+                errors.push("Категория не найдена");
+            }
+            if (!fileName) {
+                errors.push("Картинка не загружена");
+            }
+            if (!name) {
+                errors.push("Название не указано");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
-            const result = await Category.update(
+            await Category.update(
                 {
-                    parentId:parentId,
-                    name:name,
-                    img:fileName,
+                    parentId: parentId,
+                    name: name,
+                    filename: fileName,
                 },
                 {
-                    where:{
-                        id:id
-                    }
+                    where: {
+                        id: id,
+                    },
                 }
-            )
+            );
+            deleteImages(new Array(oldCategory));
 
-            deleteImage(tmp.img)
-
-            return(res.json(result))
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            return sendResponse(res, 200, "success", {
+                data: [await Category.findOne({ where: { id: id } })],
+            });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async delete(req, res, next) {
+    async delete(req, res) {
         try {
-            const {id} = req.params
-            const tmp = await Category.findOne({where:{id:id}})
+            const errors = [];
+            const { id } = req.params;
+            const category = await Category.findOne({ where: { id: id } });
 
-            const result = await Category.destroy({
-                where:{
-                    id:id
-                }
-            })
-            deleteImage(tmp.img)
-            
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            if (!category) {
+                errors.push("Категория не найдена");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            await Category.destroy({ where: { id: id } });
+            deleteImages(new Array(category));
+
+            return sendResponse(res, 200, "success");
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 }
 
-module.exports = new CategoryController()
+module.exports = new CategoryController();

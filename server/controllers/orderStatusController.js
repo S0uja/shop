@@ -1,70 +1,115 @@
-const {OrderStatus} = require('../models/models')
-const ApiError = require('../error/ApiError');
+const { OrderStatus } = require("../models/models");
+const sendResponse = require("../utils/sendResponse");
 
 class OrderStatusController {
-    async create(req, res, next) {
+    async create(req, res) {
         try {
-            const {name} = req.body
+            const errors = [];
+            const { name } = req.body;
 
-            const result = await OrderStatus.create({name:name})
-            
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            if (!name) {
+                errors.push("Имя не заполнено");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            const result = await OrderStatus.create({ name: name });
+
+            return sendResponse(res, 200, "success", { data: [result] });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         try {
-            const result = await OrderStatus.findAll()
+            const result = await OrderStatus.findAll();
+            const errors = [];
 
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            if (!result) {
+                errors.push("Статусы заказа не найдены");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", { data: result });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getOne(req, res, next) {
+    async getOne(req, res) {
         try {
-            const {id} = req.params
+            const { id } = req.params;
+            const errors = [];
+            const result = await OrderStatus.findOne({ where: { id: id } });
 
-            const result = await OrderStatus.findOne({where:{id:id}})
+            if (!result) {
+                errors.push("Статус заказа не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            return sendResponse(res, 200, "success", { data: [result] });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async update(req, res, next) {
+    async update(req, res) {
         try {
-            const {id} = req.params
-            const {name} = req.body
-            
-            const result = await OrderStatus.update({name:name},{where:{id:id}})
-            
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            const { id } = req.params;
+            const { name } = req.body;
+            const errors = [];
+
+            if (!result) {
+                errors.push("Статус заказа не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            await OrderStatus.update({ name: name }, { where: { id: id } });
+
+            return sendResponse(res, 200, "success", {
+                data: [await OrderStatus.findOne({ where: { id: id } })],
+            });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async delete(req, res, next) {
+    async delete(req, res) {
         try {
-            const {id} = req.params
+            const { id } = req.params;
+            const errors = [];
+            const result = await OrderStatus.destroy({ where: { id: id } });
 
-            const result = await OrderStatus.destroy({where:{id:id}})
+            if (!result) {
+                errors.push("Статус заказа не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            return sendResponse(res, 200, "success");
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 }
 
-module.exports = new OrderStatusController()
+module.exports = new OrderStatusController();

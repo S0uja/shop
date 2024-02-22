@@ -8,24 +8,28 @@ const User = sequelize.define('user', {
     fio: {type: DataTypes.STRING,allowNull: false},
     birthdate: {type: DataTypes.DATEONLY,allowNull: false},
     role:{type:DataTypes.STRING,allowNull: false,defaultValue:'user'}
-})
+});
 
 const Cart = sequelize.define('cart', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     count: {type:DataTypes.INTEGER,allowNull: false,defaultValue:'0'}
-},{timestamps: false})
+},{timestamps: false},{
+    defaultScope: {
+        attributes: { exclude: ['userId','productId'] }
+    }
+});
 
 const Category = sequelize.define('category', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     parentId: {type: DataTypes.INTEGER, allowNull: true},
     name: {type: DataTypes.STRING,allowNull: false},
-    img:{type:DataTypes.STRING,allowNull: false}
+    filename:{type:DataTypes.STRING,allowNull: false}
 })
 
 const Manufacturer = sequelize.define('manufacturer', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false},
-    logo: {type: DataTypes.STRING, allowNull: false},
+    filename: {type: DataTypes.STRING, allowNull: false},
     description: {type: DataTypes.STRING,allowNull: false},
     contact: {type: DataTypes.STRING,allowNull: false}
 })
@@ -34,12 +38,20 @@ const Order = sequelize.define('order', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     address: {type: DataTypes.STRING,allowNull: false},
     price:{type:DataTypes.INTEGER,allowNull: false, defaultValue:0}
-})
+},{
+    defaultScope: {
+        attributes: { exclude: ['orderStatusId'] }
+    }
+});
 
 const OrderProducts = sequelize.define('order_products', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     count:{type:DataTypes.INTEGER,allowNull: false}
-})
+},{
+    defaultScope: {
+        attributes: { exclude: ['orderId'] }
+    }
+});
 
 const Product = sequelize.define('product', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -51,18 +63,30 @@ const Product = sequelize.define('product', {
     storageconditions: {type: DataTypes.STRING,allowNull: true},
     structure: {type: DataTypes.STRING, allowNull:true},
     weight_volume: {type: DataTypes.STRING, allowNull: true},
-})
+},{
+    defaultScope: {
+        attributes: { exclude: ['manufacturerId','categoryId'] }
+    }
+});
 
 const ProductImages = sequelize.define('product_images', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     filename: {type: DataTypes.STRING, allowNull: false},
-})
+},{
+    defaultScope: {
+        attributes: { exclude: ['productId'] }
+    }
+});
 
 const Review = sequelize.define('review', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     text:{type: DataTypes.STRING, allowNull: false},
     rate:{type:DataTypes.INTEGER,allowNull: false,defaultValue:0}
-})
+},{
+    defaultScope: {
+        attributes: { exclude: ['reviewStatusId'] }
+    }
+});
 
 const ReviewStatus = sequelize.define('review_status', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},

@@ -1,98 +1,167 @@
-const saveImage = require('../utils/saveImage')
-const deleteImage = require('../utils/deleteImage')
-const {Manufacturer} = require('../models/models')
-const ApiError = require('../error/ApiError');
+const { Manufacturer } = require("../models/models");
+const deleteImages = require("../utils/deleteImages");
+const sendResponse = require("../utils/sendResponse");
 
 class ManufacturerController {
-    async create(req, res, next) {
+    async create(req, res) {
         try {
-            const {name,description,contact} = req.body
-            const {logo} = req.files
+            const { name, description, contact } = req.body;
+            const fileName = req.file?.filename || null;
+            const errors = [];
 
-            const fileName = saveImage(logo)
+            if (!fileName) {
+                errors.push("Картинка не загружена");
+            }
+            if (!name) {
+                errors.push("Название не указано");
+            }
+            if (!description) {
+                errors.push("Описание не указано");
+            }
+            if (!contact) {
+                errors.push("Контакт не указан");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
-            const result = await Manufacturer.create({
-                name:name,
-                logo:fileName,
-                description:description,
-                contact:contact
-            })
+            const manufacturer = await Manufacturer.create({
+                name: name,
+                filename: fileName,
+                description: description,
+                contact: contact,
+            });
 
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            return sendResponse(res, 200, "success", { data: [manufacturer] });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         try {
-            const result = await Manufacturer.findAll()
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            const manufacturerList = await Manufacturer.findAll();
+            const errors = [];
+
+            if (!manufacturerList) {
+                errors.push("Производители не найдены");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", {
+                data: manufacturerList,
+            });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getOne(req, res, next) {
+    async getOne(req, res) {
         try {
-            const {id} = req.params
-            
-            const result = await Manufacturer.findOne({where:{id:id}})
+            const { id } = req.params;
+            const manufacturer = await Manufacturer.findOne({
+                where: { id: id },
+            });
+            const errors = [];
 
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            if (!manufacturer) {
+                errors.push("Категория не найдена");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", { data: [result] });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async update(req, res, next) {
+    async update(req, res) {
         try {
-            const {id} = req.params
-            const {name,description,contact} = req.body
-            const {logo} = req.files
+            const { id } = req.params;
+            const { name, description, contact } = req.body;
+            const fileName = req.file?.filename || null;
+            const oldManufacturer = await Manufacturer.findOne({
+                where: { id: id },
+            });
+            const errors = [];
 
-            const tmp = await Manufacturer.findOne({where:{id:id}})
-            const fileName = saveImage(logo)
+            if (!oldManufacturer) {
+                errors.push("Производитель не найден");
+            }
+            if (!fileName) {
+                errors.push("Картинка не загружена");
+            }
+            if (!name) {
+                errors.push("Название не указано");
+            }
+            if (!description) {
+                errors.push("Описание не указано");
+            }
+            if (!contact) {
+                errors.push("Контакт не указан");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
-            const result = await Manufacturer.update(
+            await Manufacturer.update(
                 {
-                name:name,
-                logo:fileName,
-                description:description,
-                contact:contact
+                    name: name,
+                    filename: fileName,
+                    description: description,
+                    contact: contact,
                 },
                 {
-                    where:{id:id},
+                    where: { id: id },
                 }
-            )
+            );
+            deleteImages(new Array(oldManufacturer));
 
-            deleteImage(tmp.logo)
-            
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            return sendResponse(res, 200, "success", {
+                data: [await Manufacturer.findOne({ where: { id: id } })],
+            });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async delete(req, res, next) {
+    async delete(req, res) {
         try {
-            const {id} = req.params
+            const { id } = req.params;
+            const manufacturer = await Manufacturer.findOne({
+                where: { id: id },
+            });
+            const errors = [];
 
-            const tmp = await Manufacturer.findOne({where:{id:id}})
-            const result = Manufacturer.destroy({where:{id:id}})
+            if (!manufacturer) {
+                errors.push("Производитель не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
-            deleteImage(tmp.logo)
+            Manufacturer.destroy({ where: { id: id } });
+            deleteImages(new Array(manufacturer));
 
-            return res.json(result)
-        }
-        catch (e) {
-            next(ApiError.badRequest(e.message))
+            return sendResponse(res, 200, "success");
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 }
 
-module.exports = new ManufacturerController()
+module.exports = new ManufacturerController();

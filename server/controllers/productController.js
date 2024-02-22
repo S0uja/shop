@@ -1,173 +1,343 @@
-const saveImage = require('../utils/saveImage')
-const deleteImage = require('../utils/deleteImage')
-const sequelize = require('../db')
-const {Product, ProductImages, Review, OrderProducts} = require('../models/models')
-const ApiError = require('../error/ApiError')
+const sendResponse = require("../utils/sendResponse");
+const deleteImages = require("../utils/deleteImages");
+const {
+    Product,
+    ProductImages,
+    Review,
+    OrderProducts,
+    Category,
+    Manufacturer,
+} = require("../models/models");
 
 class ProductController {
-    async create(req, res, next) {
+    async create(req, res) {
         try {
-            const {name, price, amount, description, categoryId, manufacturerId,expirationdate,storageconditions,structure,weight_volume} = req.body
-            const {images} = req.files
+            const {
+                name,
+                price,
+                amount,
+                description,
+                categoryId,
+                manufacturerId,
+                expirationdate,
+                storageconditions,
+                structure,
+                weight_volume,
+            } = req.body;
+            const images = req.files;
+            const errors = [];
 
-            const result = await Product.create({
-                name:name,
-                price:price,
-                amount:amount,
-                description:description,
-                categoryId:categoryId,
-                manufacturerId:manufacturerId,
-                expirationdate:expirationdate,
-                storageconditions:storageconditions,
-                structure:structure,
-                weight_volume:weight_volume
-            });
-            
-            if(images){
-                images.forEach(async (img)=>{
-                    const fileName = saveImage(img)
-                    await ProductImages.create({filename:fileName,productId:result.id})
-                })
+            if (!name) {
+                errors.push("Название не указано");
             }
-            
-            
-            return res.json(await Product.findOne({where:{id:result.id},include:[ProductImages]}))
-        } catch (e) {
-            next(ApiError.badRequest(e.message))
-        }
+            if (!price) {
+                errors.push("Цена не указана");
+            }
+            if (!amount) {
+                errors.push("Количество не указано");
+            }
+            if (!description) {
+                errors.push("Описание не указано");
+            }
+            if (!categoryId) {
+                errors.push("Категория не указана");
+            }
+            if (!manufacturerId) {
+                errors.push("Идентификатор производителя не указан");
+            }
+            if (!expirationdate) {
+                errors.push("Срок годности не указан");
+            }
+            if (!storageconditions) {
+                errors.push("Условия хранения не указаны");
+            }
+            if (!structure) {
+                errors.push("Состав не указан");
+            }
+            if (!weight_volume) {
+                errors.push("Объем или вес не указан");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
 
+            const product = await Product.create({
+                name: name,
+                price: price,
+                amount: amount,
+                description: description,
+                categoryId: categoryId,
+                manufacturerId: manufacturerId,
+                expirationdate: expirationdate,
+                storageconditions: storageconditions,
+                structure: structure,
+                weight_volume: weight_volume,
+            });
+
+            for (const image of images) {
+                await ProductImages.create({
+                    filename: image.filename,
+                    productId: product.id,
+                });
+            }
+
+            return sendResponse(res, 200, "success", {
+                data: [
+                    await Product.findOne({
+                        where: { id: product.id },
+                        include: [ProductImages, Category, Manufacturer],
+                    }),
+                ],
+            });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
+        }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         try {
-            let {limit,page,sort,sortmode} = req.query
-
-            sort = sort || 'updateAt'
-            sortmode = sortmode || 'asc'
-            page = parseInt(page) || 1
-            limit = parseInt(limit) || 5
-
-            const offset = page * limit - limit
-
-            const result = await Product.findAll({
+            let { limit, page, sort, sortmode } = req.query;
+            sort = sort || "updatedAt";
+            sortmode = sortmode || "asc";
+            page = parseInt(page) || 1;
+            limit = parseInt(limit) || 5;
+            const offset = page * limit - limit;
+            const productsList = await Product.findAll({
                 include: [
                     ProductImages,
+                    Category,
+                    Manufacturer,
                     {
                         model: Review,
-                        attributes: []
+                        attributes: [],
                     },
                     {
                         model: OrderProducts,
-                        attributes: []
-                    }
+                        attributes: [],
+                    },
                 ],
                 attributes: {
                     include: [
-                        [sequelize.literal('(SELECT AVG(rate) FROM reviews WHERE reviews.productId = product.id)'), 'avgReview'],
-                        [sequelize.literal('(SELECT COUNT(*) FROM order_products WHERE order_products.productId = product.id)'), 'orders']
+                        [
+                            sequelize.literal(
+                                "(SELECT AVG(rate) FROM reviews WHERE reviews.productId = product.id)"
+                            ),
+                            "avgReview",
+                        ],
+                        [
+                            sequelize.literal(
+                                "(SELECT COUNT(*) FROM order_products WHERE order_products.productId = product.id)"
+                            ),
+                            "orders",
+                        ],
                     ],
                 },
                 order: [[sort, sortmode]],
                 limit: limit,
-                offset: offset
+                offset: offset,
             });
+            const errors = [];
 
-            return res.json(result)
+            if (!productsList) {
+                errors.push("Товары не найдены");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", { data: productsList });
         } catch (e) {
-            next(ApiError.badRequest(e.message))
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async getOne(req, res, next) {
+    async getOne(req, res) {
         try {
-            const {id} = req.params
-
-            const result = await Product.findOne({
-                where: {id:id},
+            const { id } = req.params;
+            const errors = [];
+            const product = await Product.findOne({
+                where: { id: id },
                 include: [
+                    Category,
+                    Manufacturer,
                     ProductImages,
                     Review,
                     {
-                        model:OrderProducts,
-                        attributes:[]
-                    }
+                        model: OrderProducts,
+                        attributes: [],
+                    },
                 ],
                 attributes: {
                     include: [
-                        [sequelize.fn('AVG', sequelize.col('reviews.rate')), 'avgReview'],
-                        [sequelize.fn('COUNT', sequelize.col('order_products.id')), 'orders'],
+                        [
+                            sequelize.fn("AVG", sequelize.col("reviews.rate")),
+                            "avgReview",
+                        ],
+                        [
+                            sequelize.fn(
+                                "COUNT",
+                                sequelize.col("order_products.id")
+                            ),
+                            "orders",
+                        ],
                     ],
                 },
-                group: ['product.id','product_images.id','reviews.id'],
-            })
-
-            return res.json(result)
-        } catch (e) {
-            next(ApiError.badRequest(e.message))
-        }
-    }
-
-    async update(req, res, next) {
-        try {
-            const {id} = req.params
-            const {name, price, amount, description, categoryId, manufacturerId,expirationdate,storageconditions,structure,weight_volume} = req.body
-            const {images} = req.files
-
-            const tmp = await ProductImages.findAll({where:{productId:id}})
-            await ProductImages.destroy({where:{productId:id}})
-
-            const result = await Product.update({
-                name:name,
-                price:price,
-                amount:amount,
-                description:description,
-                categoryId:categoryId,
-                manufacturerId:manufacturerId,
-                expirationdate:expirationdate,
-                storageconditions:storageconditions,
-                structure:structure,
-                weight_volume:weight_volume
-            },
-            {
-                where:{id:id}
+                group: ["product.id", "product_images.id", "reviews.id"],
             });
 
-            if(images){
-                images.forEach(async (img)=>{
-                    const fileName = saveImage(img)
-                    await ProductImages.create({filename:fileName,productId:id})
-                })
+            if (!product) {
+                errors.push("Товар не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
             }
 
-            if(tmp){
-                tmp.forEach((img)=>{
-                    deleteImage(img.filename)
-                })
-            }
-            
-            return res.json(result)
-
+            return sendResponse(res, 200, "success", { data: [product] });
         } catch (e) {
-            next(ApiError.badRequest(e.message))
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 
-    async delete(req, res, next) {
+    async update(req, res) {
         try {
-            const {id} = req.params
-            const tmp = await ProductImages.findAll({where:{productId:id}})
-            const result = await Product.destroy({where:{id:id}})
-            if(tmp){
-                tmp.forEach((img)=>{
-                    ProductImages.destroy({where:{id:img.id}})
-                    deleteImage(img.filename)
-                })
+            const { id } = req.params;
+            const {
+                name,
+                price,
+                amount,
+                description,
+                categoryId,
+                manufacturerId,
+                expirationdate,
+                storageconditions,
+                structure,
+                weight_volume,
+            } = req.body;
+            const images = req.files;
+            const oldProduct = await Product.findAll({ where: { id: id } });
+            const oldProductImages = await ProductImages.findAll({
+                where: { productId: id },
+            });
+            const errors = [];
+
+            if (!oldProduct) {
+                errors.push("Товар не найден");
             }
-            return res.json(result)
+            if (!name) {
+                errors.push("Название не указано");
+            }
+            if (!price) {
+                errors.push("Цена не указана");
+            }
+            if (!amount) {
+                errors.push("Количество не указано");
+            }
+            if (!description) {
+                errors.push("Описание не указано");
+            }
+            if (!categoryId) {
+                errors.push("Категория не указана");
+            }
+            if (!manufacturerId) {
+                errors.push("Идентификатор производителя не указан");
+            }
+            if (!expirationdate) {
+                errors.push("Срок годности не указан");
+            }
+            if (!storageconditions) {
+                errors.push("Условия хранения не указаны");
+            }
+            if (!structure) {
+                errors.push("Состав не указан");
+            }
+            if (!weight_volume) {
+                errors.push("Объем или вес не указан");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            //Обновление данные продукта
+            await Product.update(
+                {
+                    name: name,
+                    price: price,
+                    amount: amount,
+                    description: description,
+                    categoryId: categoryId,
+                    manufacturerId: manufacturerId,
+                    expirationdate: expirationdate,
+                    storageconditions: storageconditions,
+                    structure: structure,
+                    weight_volume: weight_volume,
+                },
+                {
+                    where: { id: id },
+                }
+            );
+
+            //Удаление старых изображений
+            await ProductImages.destroy({ where: { productId: id } });
+            deleteImages(oldProductImages);
+
+            //Сохранение новых изображений
+            for (const image of images) {
+                await ProductImages.create({
+                    filename: image.filename,
+                    productId: id,
+                });
+            }
+
+            return sendResponse(res, 200, "success", {
+                data: [
+                    await Product.findOne({
+                        where: { id: id },
+                        include: [ProductImages, Category, Manufacturer],
+                    }),
+                ],
+            });
         } catch (e) {
-            next(ApiError.badRequest(e.message))
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
+        }
+    }
+
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+            const product = await Product.findOne({ where: { id: id } });
+            const errors = [];
+
+            if (!product) {
+                errors.push("Товар не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 400, "error", { message: errors });
+            }
+
+            //Удаление товара
+            await Product.destroy({ where: { id: id } });
+
+            //Удаление изображений
+            deleteImages(
+                await ProductImages.findAll({ where: { productId: id } })
+            );
+            await ProductImages.destroy({ where: { productId: id } });
+
+            return sendResponse(res, 200, "success");
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
         }
     }
 }
 
-module.exports = new ProductController()
+module.exports = new ProductController();
