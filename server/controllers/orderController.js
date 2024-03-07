@@ -4,6 +4,7 @@ const {
     OrderStatus,
     Product,
     User,
+    ProductImages,
 } = require("../models/models");
 const sendResponse = require("../utils/sendResponse");
 
@@ -33,7 +34,7 @@ class OrderController {
                 errors.push("Номер пользователя не заполнен");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const order = await Order.create({
@@ -99,7 +100,7 @@ class OrderController {
                 errors.push("Статус заказа не указан");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const order = await Order.create({
@@ -146,7 +147,12 @@ class OrderController {
             const orderList = await Order.findAll({
                 where: { userId: userId },
                 include: [
-                    { model: OrderProducts, include: [Product], OrderStatus },
+                    {model:OrderProducts,include:[
+                        {model:Product,include:[
+                            ProductImages
+                        ]}
+                    ]},
+                    OrderStatus
                 ],
             });
 
@@ -154,7 +160,7 @@ class OrderController {
                 errors.push("Заказы не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: orderList });
@@ -183,7 +189,7 @@ class OrderController {
                 errors.push("Заказ не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [order] });
@@ -207,7 +213,7 @@ class OrderController {
                 errors.push("Заказы не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: orderList });
@@ -234,7 +240,7 @@ class OrderController {
                 errors.push("Заказ не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [order] });
@@ -278,7 +284,7 @@ class OrderController {
                 errors.push("Заказ не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Order.update(
@@ -331,7 +337,7 @@ class OrderController {
                 errors.push("Заказ не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
             await OrderProducts.destroy({ where: { orderId: id } });
             await Order.destroy({ where: { id: id } });

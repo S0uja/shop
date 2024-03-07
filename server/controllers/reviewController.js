@@ -20,7 +20,7 @@ class ReviewController {
                 errors.push("Номер пользователя не заполнен");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Review.create({
@@ -61,7 +61,7 @@ class ReviewController {
                 errors.push("Оценка не заполнена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const result = await Review.create({
@@ -96,7 +96,7 @@ class ReviewController {
                 errors.push("Отзывы не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: result });
@@ -119,7 +119,7 @@ class ReviewController {
                 errors.push("Отзыв не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -142,7 +142,7 @@ class ReviewController {
                 errors.push("Отзывы не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: result });
@@ -169,7 +169,7 @@ class ReviewController {
                 errors.push("Отзыв не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -206,7 +206,7 @@ class ReviewController {
                 errors.push("Статус не заполнен");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Review.update(
@@ -257,7 +257,7 @@ class ReviewController {
                 errors.push("Оценка не заполнена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Review.update(
@@ -290,7 +290,7 @@ class ReviewController {
                 errors.push("Отзыв не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success");
@@ -313,7 +313,7 @@ class ReviewController {
                 errors.push("Отзыв не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success");

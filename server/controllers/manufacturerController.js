@@ -22,7 +22,7 @@ class ManufacturerController {
                 errors.push("Контакт не указан");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const manufacturer = await Manufacturer.create({
@@ -49,7 +49,7 @@ class ManufacturerController {
                 errors.push("Производители не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", {
@@ -74,7 +74,7 @@ class ManufacturerController {
                 errors.push("Категория не найдена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -111,7 +111,7 @@ class ManufacturerController {
                 errors.push("Контакт не указан");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Manufacturer.update(
@@ -149,7 +149,7 @@ class ManufacturerController {
                 errors.push("Производитель не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             Manufacturer.destroy({ where: { id: id } });

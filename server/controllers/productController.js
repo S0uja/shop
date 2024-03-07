@@ -1,5 +1,6 @@
 const sendResponse = require("../utils/sendResponse");
 const deleteImages = require("../utils/deleteImages");
+const sequelize = require("sequelize");
 const {
     Product,
     ProductImages,
@@ -98,11 +99,13 @@ class ProductController {
 
     async getAll(req, res) {
         try {
-            let { limit, page, sort, sortmode } = req.query;
+            let { limit, page, sort, sortmode, search, category } = req.query;
             sort = sort || "updatedAt";
             sortmode = sortmode || "asc";
+            search = search || ''
+            category = category || ''
             page = parseInt(page) || 1;
-            limit = parseInt(limit) || 5;
+            limit = parseInt(limit) || 20;
             const offset = page * limit - limit;
             const productsList = await Product.findAll({
                 include: [
@@ -134,10 +137,18 @@ class ProductController {
                         ],
                     ],
                 },
+                where: {
+                    name: {[sequelize.Op.like]:`%${search}%`},
+                    ...(category ? {categoryId: category} : {}),
+                },
                 order: [[sort, sortmode]],
                 limit: limit,
                 offset: offset,
             });
+            
+            const products = await Product.findAndCountAll({where:{name: {[sequelize.Op.like]:`%${search}%`},...(category ? {categoryId: category} : {})}})
+            const totalProducts = products.count
+            const totalPages = Math.ceil(totalProducts / limit);
             const errors = [];
 
             if (!productsList) {
@@ -147,7 +158,7 @@ class ProductController {
                 return sendResponse(res, 400, "error", { message: errors });
             }
 
-            return sendResponse(res, 200, "success", { data: productsList });
+            return sendResponse(res, 200, "success", { data: {list:productsList,totalPages:totalPages }})
         } catch (e) {
             sendResponse(res, 500, "error", {
                 message: `Ошибка сервера - ${e}`,

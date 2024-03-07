@@ -18,7 +18,7 @@ class CartController {
                 errors.push("Количество товара не указано");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const result = await Cart.create({
@@ -56,7 +56,7 @@ class CartController {
                 errors.push("Количество товара не указано");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const result = await Cart.create({
@@ -90,7 +90,7 @@ class CartController {
                 errors.push("Записи в корзине не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", "", { data: result });
@@ -113,7 +113,7 @@ class CartController {
                 errors.push("Запись в корзине не найдена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -137,7 +137,7 @@ class CartController {
                 errors.push("Записи в корзине не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: result });
@@ -161,7 +161,7 @@ class CartController {
                 errors.push("Запись в корзине не найдена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -196,7 +196,7 @@ class CartController {
                 errors.push("Код пользователя не указан");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Cart.update(
@@ -238,7 +238,7 @@ class CartController {
                 errors.push("Код пользователя не указан");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Cart.update(
@@ -275,7 +275,7 @@ class CartController {
                 errors.push("Запись в корзине не найдена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Cart.destroy({ where: { id: id, userId: userId } });
@@ -297,7 +297,7 @@ class CartController {
                 errors.push("Запись в корзине не найдена");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Cart.destroy({ where: { id: id } });

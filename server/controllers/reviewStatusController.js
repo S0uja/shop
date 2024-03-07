@@ -12,7 +12,7 @@ class ReviewStatusController {
                 errors.push("Название не заполнено");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -32,7 +32,7 @@ class ReviewStatusController {
                 errors.push("Статусы отзывов не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: result });
@@ -53,7 +53,7 @@ class ReviewStatusController {
                 errors.push("Статус отзыва не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -74,7 +74,7 @@ class ReviewStatusController {
                 errors.push("Название не заполнено");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const result = await ReviewStatus.update(
@@ -102,7 +102,7 @@ class ReviewStatusController {
                 errors.push("Статус отзыва не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success");

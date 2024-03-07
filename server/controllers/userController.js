@@ -29,7 +29,7 @@ class UserController {
                 errors.push("Пароль не заполнен");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const comparePassword = bcrypt.compareSync(password, user.password);
@@ -37,7 +37,7 @@ class UserController {
                 errors.push("Указан неверный пароль");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const token = createJWT(user.id, user.fio, user.role);
@@ -74,7 +74,7 @@ class UserController {
                 errors.push("Пользователь с таким номером уже существует");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const hashPassword = await bcrypt.hash(password, 5);
@@ -96,7 +96,7 @@ class UserController {
 
     async check(req, res) {
         const token = createJWT(req.user.id, req.user.fio, req.user.role);
-
+        
         return sendResponse(res, 200, "success", { data: [token] });
     }
 
@@ -127,7 +127,7 @@ class UserController {
                 errors.push("Пользователь с таким номером уже существует");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const hashPassword = await bcrypt.hash(password, 5);
@@ -166,7 +166,7 @@ class UserController {
                 errors.push("Пользователи не найдены");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: result });
@@ -211,7 +211,7 @@ class UserController {
                 errors.push("Пользователь не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             return sendResponse(res, 200, "success", { data: [result] });
@@ -250,7 +250,7 @@ class UserController {
                 errors.push("Пользователь с таким номером уже существует");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             const hashPassword = await bcrypt.hash(password, 5);
@@ -313,7 +313,7 @@ class UserController {
                 errors.push("Пользователь не найден");
             }
             if (errors.length) {
-                return sendResponse(res, 400, "error", { message: errors });
+                return sendResponse(res, 200, "error", { message: errors });
             }
 
             await Review.destroy({ where: { userId: id } });
