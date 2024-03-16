@@ -1,11 +1,9 @@
 import {$authHost, $host} from "./index.http";
 
-export const getAllOrders = async () => {
+export const getCart = async () => {
     try {
-        const {data} = await $authHost.get('api/order/user',{timeout: 6000})
-        if(data.status==='error'){
-            return {status:'error', data:data.body}
-        }
+        const {data} = await $authHost.get('api/cart/user', {timeout: 6000})
+        
         return {status: data.status, data:data.body}
     }
     catch (err) {
@@ -15,18 +13,13 @@ export const getAllOrders = async () => {
     }
 }
 
-export const createOrder = async (address,products,price) => {
+export const changeCart = async (json) => {
     try {
         const formdata = new FormData()
-        
-        formdata.append('address', address)
-        formdata.append('products', JSON.stringify(products))
-        formdata.append('price', price)
+        formdata.append('json', json)
 
-        const {data} = await $authHost.post('api/order/user', formdata, {timeout: 6000})
-        if(data.status==='error'){
-            return {status:'error', data:data.body}
-        }
+        const {data} = await $authHost.post(`api/cart/user`,formdata, {timeout: 6000})
+        
         return {status: data.status, data:data.body}
     }
     catch (err) {

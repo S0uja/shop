@@ -33,11 +33,15 @@ export const getOneProduct = async (id) => {
     }
 }
 
-export const create = async () => {
-}
-
-export const update = async () => {
-}
-
-export const del = async () => {
+export const getMainPage = async () => {
+    try {
+        const {data} = await $host.get(`api/product/mp`)
+        
+        return {status: data.status, data:data.body}
+    }
+    catch (err) {
+        if (err.code === 'ECONNABORTED') {
+            return {status:'error', data:{message:['Превышено время ожидания, попробуйте чуть позже']}}
+        }
+    }
 }

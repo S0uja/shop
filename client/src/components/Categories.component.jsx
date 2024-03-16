@@ -11,11 +11,7 @@ import { handleRequest } from '../utils/HandleRequest.util'
 const Categories = () => {
     const Categories = useSelector(state => state.categories.categories)
     const [open, setOpen] = useState(0)
-    const navigate = useNavigate()
     const dispatch = useDispatch()
-    const Page = useSelector(state => state.products.page)
-    const Sort = useSelector(state => state.products.sort)
-    const Search = useSelector(state => state.products.search)
     const Category = useSelector(state => state.products.category)
 
     const handleOpen = (id) => {
@@ -23,23 +19,9 @@ const Categories = () => {
     }
     
     const handleChangeCategory = async (name,value) => {
-        
-        dispatch(setProducts([]))
+        if(value===Category?.value) return
         dispatch(setPage(1))
         dispatch(setCategory({name:name,value:value}))
-        
-        const res = await handleRequest(1,Search,value,navigate)  
-        if(res.status==='error'){
-            dispatch(setSnackbarModal({
-                modal:true,
-                severity:'error',
-                message:res.data.message.join('\n') || 'Произошла ошибка'
-            }))
-        }
-        else{
-            dispatch(setProducts(res.data.data.list))
-            dispatch(setTotalPages(res.data.data.totalPages))
-        }
     }
 
     return (
@@ -47,10 +29,10 @@ const Categories = () => {
             id="categories"
             sx={{
                 flexGrow:1,
+                widht:'100%',
                 bgcolor:'background.paper',
                 borderRadius:2,
                 p:2,
-                boxSizing:'border-box',
                 position:'sticky',
                 top: 8,
             }}

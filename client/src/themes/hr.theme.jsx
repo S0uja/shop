@@ -1,4 +1,5 @@
 const hr = {
+    width:'100%',
     mx:8,
     color:'rgb(64, 64, 64)',
     border:'none',

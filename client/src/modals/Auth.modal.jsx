@@ -1,14 +1,17 @@
 import {useState} from 'react'
 import font from "../themes/font.theme"
 import modal from '../themes/modal.theme'
-import {Paper,Box,Backdrop,Modal,Fade,Button,TextField,CircularProgress,Tab,IconButton} from '@mui/material';
-import {TabList,TabContext,TabPanel} from '@mui/lab';
+import {Paper,Box,Backdrop,Modal,Fade,Button,TextField,CircularProgress,Tab,IconButton} from '@mui/material'
+import {TabList,TabContext,TabPanel} from '@mui/lab'
 const activeTabSx = { height:'100%',p:0,boxSizing:'border-box',display:'flex',flexDirection:'column',justifyContent:'space-between' }
 import { useDispatch, useSelector } from 'react-redux'
 import { setAuthModal, setSnackbarModal } from '../store/modals.store'
 import { userLogin, userRegistration } from '../http/User.http'
 import {setUserInfo} from "../store/user.store"
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from '@mui/icons-material/Close'
+import SyncCart from '../utils/SyncCart.util'
+import { setCart } from '../store/cart.store'
+import { getCart } from '../http/Cart.http'
 
 const AuthModal = () => {
     const [singIn,setSingIn] = useState({
@@ -122,6 +125,11 @@ const AuthModal = () => {
                     dispatch(setUserInfo(res.data.data[0]))
                     dispatch(setAuthModal(false))
                     setLoading(false)
+                    getCart().then(res=>{
+                        SyncCart(res.data.data[0].json).then(cart=>{
+                            dispatch(setCart(cart))
+                        })
+                    })
                 }
             })
         }
@@ -219,6 +227,11 @@ const AuthModal = () => {
                     dispatch(setUserInfo(res.data.data[0]))
                     dispatch(setAuthModal(false))
                     setLoading(false)
+                    getCart().then(res=>{
+                        SyncCart(res.data.data[0].json).then(cart=>{
+                            dispatch(setCart(cart))
+                        })
+                    })
                 }
             })
         }
@@ -239,7 +252,7 @@ const AuthModal = () => {
             }}
             sx={{boxSizing:'border-box'}}
         >
-            <Box sx={{...modal,height:'450px',maxWidth:'350px',justifyContent:'start',flexDirection:'column'}}>
+            <Box sx={{...modal,minHeight:'450px',maxWidth:'350px',justifyContent:'start',flexDirection:'column'}}>
                 <IconButton
                     aria-label="close"
                     onClick={handleCloseAuthModal}
@@ -280,9 +293,17 @@ const AuthModal = () => {
                                         placeholder="+7 (___) ___-__-__"
                                         value={singIn.number}
                                         onChange={handlePhoneChange}
+                                        FormHelperTextProps={{
+                                            style:  { 
+                                              ...font,
+                                              color:'',
+                                              fontSize:''
+                                            }
+                                        }}
                                         InputLabelProps={{
                                             style: {
                                             ...font,
+                                            color:''
                                             }
                                         }}
                                         InputProps={{
@@ -301,9 +322,17 @@ const AuthModal = () => {
                                         variant="outlined"
                                         value={singIn.password}
                                         onChange={(e) => handleChangeSingIn('password',e.target.value)}
+                                        FormHelperTextProps={{
+                                            style:  { 
+                                              ...font,
+                                              color:'',
+                                              fontSize:''
+                                            }
+                                        }}
                                         InputLabelProps={{
                                             style: {
                                             ...font,
+                                            color:''
                                             }
                                         }}
                                         InputProps={{
@@ -335,7 +364,8 @@ const AuthModal = () => {
                                         onChange={handlePhoneChange}
                                         InputLabelProps={{
                                             style: {
-                                            ...font,
+                                                ...font,
+                                                color:'',
                                             }
                                         }}
                                         InputProps={{
@@ -344,6 +374,13 @@ const AuthModal = () => {
                                                 borderRadius: 8
                                             }
                                         }}
+                                        FormHelperTextProps={{
+                                            style:  { 
+                                              ...font,
+                                              color:'',
+                                              fontSize:''
+                                            }
+                                          }}
                                     />
                                     <TextField
                                         error={singUpErrors.password.status}
@@ -354,10 +391,17 @@ const AuthModal = () => {
                                         variant="outlined"
                                         value={singUp.password}
                                         onChange={(e) => handleChangeSingUp('password',e.target.value)}
+                                        FormHelperTextProps={{
+                                            style:  { 
+                                                ...font,
+                                                color:'',
+                                                fontSize:''
+                                            }
+                                        }}
                                         InputLabelProps={{
                                             style: {
-                                            color: 'blue',
-                                            ...font,
+                                                ...font,
+                                                color: '',
                                             }
                                         }}
                                         InputProps={{
@@ -375,10 +419,17 @@ const AuthModal = () => {
                                         variant="outlined"
                                         value={singUp.fio}
                                         onChange={(e) => handleChangeSingUp('fio',e.target.value)}
+                                        FormHelperTextProps={{
+                                            style:  { 
+                                              ...font,
+                                              color:'',
+                                              fontSize:''
+                                            }
+                                        }}
                                         InputLabelProps={{
                                             style: {
-                                            color: 'blue',
-                                            ...font,
+                                                ...font,
+                                                color: '',
                                             }
                                         }}
                                         InputProps={{
@@ -394,12 +445,18 @@ const AuthModal = () => {
                                         sx={{width:'100%',mb:2}}
                                         type='date'
                                         label="Дата рождения"
-                                        
+                                        FormHelperTextProps={{
+                                            style:  { 
+                                              ...font,
+                                              color:'',
+                                              fontSize:''
+                                            }
+                                        }}
                                         InputLabelProps={{
                                             shrink: true,
                                             style: {
-                                                color: 'blue',
                                                 ...font,
+                                                color:''
                                             }
                                         }}
                                         variant="outlined"

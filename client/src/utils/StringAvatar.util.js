@@ -2,6 +2,8 @@ import StringToColor from './StringToColor.util'
 import font from '../themes/font.theme'
 
 const StringAvatar = (name) => {
+    if(!name) return
+    
     return {
         sx: {
             bgcolor: StringToColor(name),

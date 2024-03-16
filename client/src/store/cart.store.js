@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { changeCart } from '../http/Cart.http'
 
 export const cart = createSlice({
   name: 'cart',
@@ -8,10 +9,6 @@ export const cart = createSlice({
   reducers: {
     setCart: (state, action) => {
       state.cart = action.payload
-      localStorage.setItem('cart',JSON.stringify(state.cart))
-    },
-    clearCart: (state, action) => {
-      state.cart = []
       localStorage.setItem('cart',JSON.stringify(state.cart))
     },
     addItem: (state, action) => {
@@ -26,14 +23,14 @@ export const cart = createSlice({
           }
         })
       }
-      
+      changeCart(JSON.stringify(state.cart))
       localStorage.setItem('cart',JSON.stringify(state.cart))
     },
     removeItem: (state,action) => {
       state.cart.forEach(item => {
         if(item.productId === action.payload.productId) {
           if(item.count<=1){
-            state.cart = state.cart.filter(itemTMP => itemTMP.productId !== action.payload.productId);
+            state.cart = state.cart.filter(itemTMP => itemTMP.productId !== action.payload.productId)
           }else{
             item.count--
             item.price-=item.product.price
@@ -41,10 +38,12 @@ export const cart = createSlice({
           
         }
       })
+      changeCart(JSON.stringify(state.cart))
       localStorage.setItem('cart',JSON.stringify(state.cart))
     },
     deleteItem: (state, action) => {
-      state.cart = state.cart.filter(item => item.productId !== action.payload.productId);
+      state.cart = state.cart.filter(item => item.productId !== action.payload.productId)
+      changeCart(JSON.stringify(state.cart))
       localStorage.setItem('cart',JSON.stringify(state.cart))
     },
   },

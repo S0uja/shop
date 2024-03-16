@@ -4,7 +4,7 @@ import Categories from './components/Categories.component'
 import Catalog from './components/Catalog.component'
 import { useDispatch } from 'react-redux'
 import { getAllCategories, getOneCategory } from './http/Categories.http'
-import { getAllProducts } from './http/Products.http'
+import { getAllProducts, getMainPage } from './http/Products.http'
 import ProductModal from './modals/Product.modal'
 import AuthModal from './modals/Auth.modal'
 import {ThemeProvider} from '@mui/material/styles';
@@ -14,15 +14,17 @@ import Header from './components/Header.component'
 import { userCheck } from './http/User.http'
 import { getAllOrders } from './http/Orders.http'
 import {setUserInfo} from "./store/user.store"
+import SyncCart from './utils/SyncCart.util'
 import {setCart} from './store/cart.store'
 import SnackbarModal from './modals/Snackbar.modal'
 import Grid from '@mui/material/Unstable_Grid2'
 import CartFab from './components/Fab.component'
 import CartModal from './modals/Cart.modal'
-import { setOrders } from './store/order.store'
+import { setOrders,setAddresses } from './store/user.store'
 import OrderModal from './modals/Order.modal'
 import ProfileModal from './modals/Profile.modal'
-import { setProducts, setTotalPages, setPage, setCategory, setSearch, setSearchInput, setProductsLoading } from './store/products.store'
+import { setProducts, setCollections, setTotalPages, setPage, setCategory, setSearch, setSearchInput, setProductsLoading } from './store/products.store'
+import { getCart } from './http/Cart.http'
 
 export const App = () => {
 
@@ -31,6 +33,13 @@ export const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+
+        if (localStorage.getItem('token')) {
+          const userResponse = await userCheck();
+          if (userResponse) {
+            dispatch(setUserInfo(userResponse.data.data[0]))
+          }
+        }
         
         const categoriesResponse = await getAllCategories()
         if (categoriesResponse) {
@@ -59,34 +68,41 @@ export const App = () => {
           dispatch(setSearchInput(params.search))
         }
 
-        const productsResponse = await getAllProducts(params?.page,params?.category,params?.search)
-        if (productsResponse) {
+        if(!searchParams.size || !params.category && !params.search){
+          const mainPageResponse = await getMainPage()
+          dispatch(setCollections(mainPageResponse.data.data.list))
+          dispatch(setTotalPages(0))
+          dispatch(setProductsLoading(false))
+        }
+        else{
+          const productsResponse = await getAllProducts(params?.page,params?.category,params?.search)
           dispatch(setProducts(productsResponse.data.data.list))
           dispatch(setTotalPages(productsResponse.data.data.totalPages))
           dispatch(setProductsLoading(false))
         }
-
+        
         const ordersResponse = await getAllOrders()
         if (ordersResponse) {
           dispatch(setOrders(ordersResponse.data.data));
         }
-  
-        if (localStorage.getItem('token')) {
-          const userResponse = await userCheck();
-          if (userResponse) {
-            dispatch(setUserInfo(userResponse.data.data[0]))
-          }
+        
+        if (localStorage.getItem('addresses')) {
+          dispatch(setAddresses(JSON.parse(localStorage.getItem('addresses'))))
         }
-  
-        if (!localStorage.getItem('cart')) {
-          localStorage.setItem('cart', JSON.stringify([]))
-        } 
-        else {
-          dispatch(setCart(JSON.parse(localStorage.getItem('cart'))))
+
+        if (localStorage.getItem('cart')) {
+          const localCart = JSON.parse(localStorage.getItem('cart'))
+          const syncCart = await SyncCart(localCart)
+          dispatch(setCart(syncCart))
+        }
+        else if(localStorage.getItem('token')) {
+          const localCart = await getCart()
+          const syncCart = await SyncCart(localCart.data.data[0].json)
+          dispatch(setCart(syncCart))
         }
 
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Ошибка в запросах:', error);
       }
     }
     fetchData()
@@ -102,35 +118,40 @@ export const App = () => {
       <CartModal />
       <CartFab/>
 
-      <Grid container columnSpacing={2} sx={{boxSizing:'border-box',m:0,maxWidth:'1500px',position:'relative'}}>
+      <Grid container maxWidth={'xxl'} columnSpacing={2} sx={{width:'100%',m:0,position:'relative'}}>
         <Grid 
           es={12} xs={12} sm={12} md={12} lg={12} xl={12}
-          sx={{display:{es:'block',xs:'block',sm:'block',md:'block',lg:'block',xl:'block'}}}
+          sx={{width:'100%',display:{es:'block',xs:'block',sm:'block',md:'block',lg:'block',xl:'block'}}}
         >
           <Header />
         </Grid>
+
         <Grid
           es={12} xs={12} sm={12} md={12} lg={12} xl={12}
-          sx={{display:{ex:'block',xs:'block', sm:'block',md:'block',lg:'block',xl:'block'},position:'sticky',zIndex:5,top:0,backgroundColor:'#eeeeee',height:'8px'}}
+          sx={{width:'100%',display:{ex:'block',xs:'block', sm:'block',md:'block',lg:'block',xl:'block'},position:'sticky',zIndex:5,top:0,backgroundColor:'#eeeeee',height:'8px'}}
         >
         </Grid>
+
         <Grid
           es={0} xs={0} sm={0} md={3} lg={3} xl={2}
-          sx={{display:{es:'none',xs:'none',sm:'none',md:'block',lg:'block',xl:'block'}}}
+          sx={{width:'100%',display:{es:'none',xs:'none',sm:'none',md:'block',lg:'block',xl:'block'}}}
         >
           <Categories />
         </Grid>
+
         <Grid
           es={12} xs={12} sm={12} md={9} lg={9} xl={7}
         >
           <Catalog />
         </Grid>
+
         <Grid
           es={0} xs={0} sm={0} md={0} lg={0} xl={3}
-          sx={{display:{es:'none',xs:'none',sm:'none',md:'none',lg:'block',xl:'block'}}}
+          sx={{display:{es:'none',xs:'none',sm:'none',md:'none',lg:'none',xl:'block'}}}
         >
           <Cart />
         </Grid>
+
       </Grid>
     </ThemeProvider>
   )

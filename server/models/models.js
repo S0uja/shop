@@ -12,12 +12,8 @@ const User = sequelize.define('user', {
 
 const Cart = sequelize.define('cart', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    count: {type:DataTypes.INTEGER,allowNull: false,defaultValue:'0'}
-},{timestamps: false},{
-    defaultScope: {
-        attributes: { exclude: ['userId','productId'] }
-    }
-});
+    json: {type:DataTypes.JSON,allowNull: false,defaultValue:''}
+},{timestamps: false})
 
 const Category = sequelize.define('category', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -98,17 +94,31 @@ const OrderStatus = sequelize.define('order_status', {
     name: {type: DataTypes.STRING, allowNull:false}
 },{timestamps: false})
 
+const Collection = sequelize.define('collection', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull:false},
+    visible: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue:true},
+    filename: {type: DataTypes.STRING, allowNull:true, defaultValue:null}
+})
+
+const CollectionProducts = sequelize.define('collection_products', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
+},{timestamps: false})
+
 User.hasMany(Cart)
 Cart.belongsTo(User)
+
+Collection.hasMany(CollectionProducts)
+CollectionProducts.belongsTo(Collection)
+
+Product.hasMany(CollectionProducts)
+CollectionProducts.belongsTo(Product)
 
 User.hasMany(Review)
 Review.belongsTo(User)
 
 Product.hasMany(Review)
 Review.belongsTo(Product)
-
-Product.hasMany(Cart)
-Cart.belongsTo(Product)
 
 Product.hasMany(ProductImages)
 ProductImages.belongsTo(Product)
@@ -145,7 +155,9 @@ module.exports = {
     ProductImages,
     Review,
     ReviewStatus,
-    OrderStatus
+    OrderStatus,
+    Collection,
+    CollectionProducts
 }
 
 

@@ -17,7 +17,8 @@ const CardComponent = (props) => {
   }
 
   return (
-    <Card sx={{
+    <Card
+      sx={{
         flexBasis: {
           es:'calc(50% - 16px)',
           xs:'calc(33.33% - 16px)',

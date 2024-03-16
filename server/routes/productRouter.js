@@ -3,6 +3,7 @@ const router = new Router()
 const ProductController = require('../controllers/productController')
 const fileMiddleware = require('../middleware/fileMiddleware')
 
+router.get('/mp', ProductController.getMainPage)
 router.post('/', fileMiddleware.array('images'), ProductController.create)
 router.get('/', ProductController.getAll)
 router.get('/:id', ProductController.getOne)

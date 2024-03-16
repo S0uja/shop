@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 export const products = createSlice({
   name: 'products',
   initialState: {
+    collections: [],
     products: [],
     productsLoading:true,
     productInfo: null,
@@ -14,6 +15,10 @@ export const products = createSlice({
     searchInput:''
   },
   reducers: {
+    setCollections: (state, action) => {
+      state.collections = action.payload
+      state.products = []
+    }, 
     setProductsLoading: (state, action) => {
       state.productsLoading = action.payload
     }, 
@@ -22,6 +27,7 @@ export const products = createSlice({
     },  
     setProducts: (state, action) => {
       state.products = action.payload
+      state.collections = []
     },  
     setProduct: (state,action) => {
       state.productInfo = action.payload
@@ -44,6 +50,6 @@ export const products = createSlice({
   }
 })
 
-export const { setProductsLoading, setSearchInput, setTotalPages, setProducts, setProduct, setSearch, setCategory, setPage, setSort } = products.actions
+export const { setCollections, setProductsLoading, setSearchInput, setTotalPages, setProducts, setProduct, setSearch, setCategory, setPage, setSort } = products.actions
 
 export default products.reducer

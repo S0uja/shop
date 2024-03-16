@@ -11,10 +11,11 @@ const sendResponse = require("../utils/sendResponse");
 class OrderController {
     async createUser(req, res) {
         try {
-            const errors = [];
-            const { address, products, price } = req.body;
-            const userId = req.user.id;
-            const filteredProducts = [];
+            const errors = []
+            let { address, products, price } = req.body
+            products = JSON.parse(products)
+            const userId = req.user.id
+            const filteredProducts = []
 
             for (const product of products) {
                 if (await Product.findOne({ where: { id: product.id } })) {
@@ -42,13 +43,15 @@ class OrderController {
                 address: address,
                 price: price,
                 orderStatusId: 1,
-            });
+            })
+            console.log(order);
             for (const product of filteredProducts) {
-                await OrderProducts.create({
+                const newProduct = await OrderProducts.create({
                     orderId: order.id,
                     productId: product.id,
                     count: product.count,
                 });
+                console.log(newProduct);
             }
 
             return sendResponse(res, 200, "success", {
@@ -56,11 +59,12 @@ class OrderController {
                     await Order.findOne({
                         where: { id: order.id },
                         include: [
-                            {
-                                model: OrderProducts,
-                                include: [Product],
-                                OrderStatus,
-                            },
+                            {model:OrderProducts,include:[
+                                {model:Product,include:[
+                                    ProductImages
+                                ]}
+                            ]},
+                            OrderStatus
                         ],
                     }),
                 ],
@@ -147,11 +151,15 @@ class OrderController {
             const orderList = await Order.findAll({
                 where: { userId: userId },
                 include: [
-                    {model:OrderProducts,include:[
-                        {model:Product,include:[
-                            ProductImages
-                        ]}
-                    ]},
+                    {
+                        model:OrderProducts,
+                        include:[
+                        {
+                            model:Product,
+                            include:[ProductImages]
+                        }
+                        ]
+                    },
                     OrderStatus
                 ],
             });

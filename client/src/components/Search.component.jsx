@@ -20,69 +20,19 @@ const Search = () => {
   const handleChangeSearch = async () => {
     if(SearchInput.trim().length === 0) return
     
-    dispatch(setProductsLoading(true))
     dispatch(setPage(1))
     dispatch(setSearch(SearchInput.trim()))
-
-    const res = await handleRequest(1,SearchInput.trim(),Category?.value || null,navigate)  
-    if(res.status==='error'){
-      dispatch(setSnackbarModal({
-          modal:true,
-          severity:'error',
-          message:res.data.message.join('\n') || 'Произошла ошибка'
-      }))
-      dispatch(setProductsLoading(false))
-    }
-    else{
-        dispatch(setProducts(res.data.data.list))
-        dispatch(setTotalPages(res.data.data.totalPages))
-        dispatch(setProductsLoading(false))
-    }
   }
 
   const handleDeleteCategory = async () => {
-    
-    dispatch(setProductsLoading(true))
     dispatch(setPage(1))
     dispatch(setCategory(null))
-
-    const res = await handleRequest(1,SearchInput.trim(),null,navigate)  
-    if(res.status==='error'){
-      dispatch(setSnackbarModal({
-          modal:true,
-          severity:'error',
-          message:res.data.message.join('\n') || 'Произошла ошибка'
-      }))
-      dispatch(setProductsLoading(false))
-    }
-    else{
-        dispatch(setProducts(res.data.data.list))
-        dispatch(setTotalPages(res.data.data.totalPages))
-        dispatch(setProductsLoading(false))
-    }
   }
 
   const handleDeleteSearch = async () => {
-    
-    dispatch(setProductsLoading(true))
     dispatch(setPage(1))
     dispatch(setSearch(null))
     dispatch(setSearchInput(''))
-
-    const res = await handleRequest(1,null,Category?.value || null ,navigate)  
-    if(res.status==='error'){
-      dispatch(setSnackbarModal({
-          modal:true,
-          severity:'error',
-          message:res.data.message.join('\n') || 'Произошла ошибка'
-      }))
-      dispatch(setProductsLoading(false))
-    }
-    else{
-        dispatch(setProducts(res.data.data.list))
-        dispatch(setTotalPages(res.data.data.totalPages))
-        dispatch(setProductsLoading(false))
-    }
   }
 
 

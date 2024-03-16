@@ -4,7 +4,6 @@ import categoriesReduser from './categories.store'
 import productsReduser from './products.store'
 import modalsReduser from './modals.store'
 import userReduser from './user.store'
-import orderReduser from './order.store'
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +12,5 @@ export const store = configureStore({
     products: productsReduser,
     modals: modalsReduser,
     user: userReduser,
-    order: orderReduser,
   },
 })

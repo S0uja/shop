@@ -14,7 +14,7 @@ import { setProduct } from '../store/products.store'
 
 const OrderModal = () => {
   const dispatch = useDispatch()
-  const Orders = useSelector(state => state.order.orders)
+  const Orders = useSelector(state => state.user.orders)
   const OrderModalStatus = useSelector(state => state.modals.orderModal)
 
   const handleOpenProductModal = (id) => {
@@ -66,7 +66,7 @@ const OrderModal = () => {
         {
           Orders.length>0
           ?
-          <List
+          <Box
             sx={{
               width:'100%',
               minWidth:'280px',
@@ -85,7 +85,7 @@ const OrderModal = () => {
             {
               Orders.map((order,i)=>{
                 return (
-                  <Box key={i} sx={{boxSizing:'border-box',height:'100%',borderRadius:2,border:'2px solid #eeeeee'}}>
+                  <Box key={i} sx={{boxSizing:'border-box',height:'auto',borderRadius:2,border:'2px solid #eeeeee'}}>
                     <Box sx={{display:'flex',justifyContent:'space-between',backgroundColor:'#eeeeee',p:2}}>
                       <Box sx={{display:'flex',flexDirection:'column',gap:1}}>
                         <Typography sx={{...font,fontWeight:800,color:'#787878',fontSize:'12px'}} variant='p'>Заказ от {FormatDate(order.createdAt)}</Typography>
@@ -99,12 +99,12 @@ const OrderModal = () => {
                       </Box>
                     </Box>
                     <Box sx={{p:2,display:'flex',gap:2,justifyContent:'space-between',flexDirection:{es:'column',xs:'column',sm:'column',md:'row',lg:'row',xl:'row'}}}>
-                      <Box sx={{display:'flex',flexDirection:'column',minWidth:'200px',gap:2}}>
+                      <Box sx={{display:'flex',flexDirection:'column',width:{es:'100%',xs:'100%',sm:'100%',md:'36%',lg:'36%',xl:'36%'},minWidth:'36%',gap:2}}>
                         <Typography sx={{...font,fontWeight:600,fontSize:'12px'}} variant='p'>Доставка на адрес {order.address}</Typography>
                         <Typography sx={{...font,fontWeight:600,fontSize:'12px'}} variant='p'>Дата обновления {FormatDate(order.updatedAt)}</Typography>
                         <Button size="small" sx={{...font,fontSize:'10px',color:''}} variant="contained" disableElevation disabled={!order.order_status.id===2}>Оценить товары</Button>
                       </Box>
-                      <Box sx={{display:'flex',flexGrow:1,gap:2,flexWrap:'wrap',justifyContent:{es:'start',xs:'start',s:'start',sm:'start',md:'end',lg:'end',xl:'end'}}}>
+                      <Box sx={{display:'flex',alignItems:'center',flexGrow:1,gap:2,flexWrap:'wrap',justifyContent:{es:'start',xs:'start',s:'start',sm:'start',md:'end',lg:'end',xl:'end'}}}>
                         {
                           order.order_products.map((product,i)=>{
                             return (
@@ -139,9 +139,13 @@ const OrderModal = () => {
                 )
               })
             }
-          </List>
+          </Box>
           :
-          <Box>Пусто</Box>
+          <Box 
+            sx={{width:'100%',fontSize:'20px',color:'rgb(120, 120, 120)',height:'100%',display:'flex',justifyContent:'center',alignItems:'center'}}
+          >
+            Вы еще не делали заказов
+          </Box>
         }
       </Box>
     </Modal>

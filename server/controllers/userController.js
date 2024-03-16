@@ -40,7 +40,7 @@ class UserController {
                 return sendResponse(res, 200, "error", { message: errors });
             }
 
-            const token = createJWT(user.id, user.fio, user.role);
+            const token = createJWT(user.id, user.fio, user.role, user.number, user.birthdate)
 
             return sendResponse(res, 200, "success", { data: [token] });
         } catch (e) {
@@ -84,7 +84,7 @@ class UserController {
                 fio: fio,
                 birthdate: birthdate,
             });
-            const token = createJWT(user.id, user.fio, user.role);
+            const token = createJWT(user.id, user.fio, user.role, user.number, user.birthdate)
 
             return sendResponse(res, 200, "success", { data: [token] });
         } catch (e) {
@@ -95,7 +95,7 @@ class UserController {
     }
 
     async check(req, res) {
-        const token = createJWT(req.user.id, req.user.fio, req.user.role);
+        const token = createJWT(req.user.id, req.user.fio, req.user.role, req.user.number,req.user.birthdate);
         
         return sendResponse(res, 200, "success", { data: [token] });
     }
@@ -222,13 +222,16 @@ class UserController {
         }
     }
 
-    async update(req, res) {
+    async updateAdmin(req, res) {
         try {
             const { id } = req.params;
             const { number, password, fio, birthdate, role } = req.body;
             const contingent = await User.findOne({
                 where: { number: number },
-            });
+            })
+            const user = await User.findOne({
+                where: { id: id },
+            })
             const errors = [];
 
             if (!number) {
@@ -246,7 +249,7 @@ class UserController {
             if (!role) {
                 errors.push("Роль не заполнена");
             }
-            if (contingent && number != contingent.number) {
+            if (contingent && number != user.number) {
                 errors.push("Пользователь с таким номером уже существует");
             }
             if (errors.length) {
@@ -296,6 +299,115 @@ class UserController {
                     }),
                 ],
             });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
+        }
+    }
+
+    async updateUser(req, res) {
+        try {
+            const id  = req.user.id;
+            const { number, fio, birthdate } = req.body;
+
+            const contingent = await User.findOne({
+                where: { number: number },
+            })
+
+            const user = await User.findOne({
+                where: { id: id },
+            })
+
+            const errors = [];
+
+            if (!number) {
+                errors.push("Номер не заполнен");
+            }
+            if (!fio) {
+                errors.push("ФИО не заполнено");
+            }
+            if (!birthdate) {
+                errors.push("Дата рождения не заполнена");
+            }
+            if (contingent && number !== user.number) {
+                errors.push("Пользователь с таким номером уже существует");
+            }
+            if (errors.length) {
+                return sendResponse(res, 200, "error", { message: errors });
+            }
+
+            await User.update(
+                {
+                    number: number,
+                    fio: fio,
+                    birthdate: birthdate
+                },
+                {
+                    where: { id: id },
+                }
+            )
+
+            const newUser = await User.findOne({
+                where: { number: number },
+            })
+
+            const token = createJWT(newUser.id, newUser.fio, newUser.role, newUser.number, newUser.birthdate)
+
+            return sendResponse(res, 200, "success", { data: [token] })
+
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
+        }
+    }
+
+    async updatePasswordUser(req, res) {
+        try {
+            const id  = req.user.id
+            const { currentPassword, newPassword } = req.body
+            console.log(id,currentPassword,newPassword);
+            const hashNewPassword = await bcrypt.hash(newPassword, 5)
+            const user = await User.findOne({
+                where: { id: id },
+            })
+            const comparePassword = bcrypt.compareSync(currentPassword, user.password)
+            const errors = []
+
+            if (!currentPassword) {
+                errors.push("Текущий пароль не заполнен");
+            }
+            if (!newPassword) {
+                errors.push("Новый пароль не заполнен");
+            }
+            if (!comparePassword) {
+                errors.push("Указан неверный текущий пароль");
+            }
+            if (!user) {
+                errors.push("Пользователь не найден");
+            }
+            if (errors.length) {
+                return sendResponse(res, 200, "error", { message: errors });
+            }
+
+            await User.update(
+                {
+                    password: hashNewPassword,
+                },
+                {
+                    where: { id: id },
+                }
+            )
+
+            const newUser = await User.findOne({
+                where: { id: id },
+            })
+
+            const token = createJWT(newUser.id, newUser.fio, newUser.role, newUser.number, newUser.birthdate)
+
+            return sendResponse(res, 200, "success", { data: [token] })
+
         } catch (e) {
             sendResponse(res, 500, "error", {
                 message: `Ошибка сервера - ${e}`,

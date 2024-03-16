@@ -2,6 +2,8 @@ const ConvertToLitersAndKilograms = (arr) => {
     let totalLiters = 0;
     let totalKilograms = 0;
     
+    // if(!arr.lenght) return { titalLiters:0, totalKilograms:0 }
+
     arr.forEach(item => {
         const weight_volume = item.product.weight_volume
         const count = item.count

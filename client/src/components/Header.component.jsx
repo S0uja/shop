@@ -9,9 +9,11 @@ import StringAvatar from '../utils/StringAvatar.util'
 import PersonIcon from '@mui/icons-material/Person'
 import LogoutIcon from '@mui/icons-material/Logout'
 import CreditScoreIcon from '@mui/icons-material/CreditScore'
-import {clearUserInfo} from '../store/user.store'
-import {clearCart} from '../store/cart.store'
+import {setUserInfo} from '../store/user.store'
+import FastfoodIcon from '@mui/icons-material/Fastfood';
+import {setCart} from '../store/cart.store'
 import { setOrderModal,setProfileModal } from '../store/modals.store';
+import ShortingFio from '../utils/ShortiongFio.util'
 
 const Header = () => {
     const [anchorEl, setAnchorEl] = React.useState(null)
@@ -31,27 +33,34 @@ const Header = () => {
     }
 
     const handleOpenAuthModal = () => {
+        handleClosePopover()
         dispatch(setAuthModal(true))
     }
 
     const handleOut = () => {
-        setIsOpen(false)
-        dispatch(clearCart())
-        dispatch(clearUserInfo())
+        handleClosePopover()
+        dispatch(setCart([]))
+        dispatch(setUserInfo({}))
+        localStorage.removeItem('cart')
+        localStorage.removeItem('token')
     }
 
     const handleOpenOrder = () => {
+        handleClosePopover()
         dispatch(setOrderModal(true))
     }
 
     const handleOpenProfile = () => {
+        setIsOpen(false)
         dispatch(setProfileModal(true))
     }
 
     return (
         <Paper id="header" elevation={0} sx={{my:'8px',alignItems:'center',justifyContent:'space-between',boxSizing:'border-box',p:2,display:'flex',width:'100%',borderRadius:2, height:60,backgroundColor:'#fff'}}>
-            <Box sx={{display:'flex',alignItems:'center'}}>
-                <img src={logo} style={{overflow:'hidden',height:'30px',borderRadius:1}} />
+            <Box sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+                {/* <img src={logo} style={{overflow:'hidden',height:'30px',borderRadius:1}} /> */}
+                <FastfoodIcon size='large' sx={{color:'rgb(64,64,64)'}}/>
+                <Typography sx={{...font,color:'rgb(64,64,64)',fontSize:'20px'}}>FoodExpress</Typography>
             </Box>
             
             {
@@ -61,7 +70,7 @@ const Header = () => {
                 :
                 <Box sx={{display:'flex',alignItems:'center'}}>
                     <Button aria-describedby={id} variant="text" onClick={handleOpenPopover} sx={{p:0,textTransform: 'none'}}>
-                        <Typography sx={{...font,mx:2}}>{UserInfo.fio}</Typography>
+                        <Typography sx={{...font,mx:2}}>{ShortingFio(UserInfo.fio)}</Typography>
                         <Avatar variant="rounded" {...StringAvatar(UserInfo.fio)} />
                     </Button>
                     <Popover

@@ -8,6 +8,8 @@ const {
     OrderProducts,
     Category,
     Manufacturer,
+    Collection,
+    CollectionProducts
 } = require("../models/models");
 
 class ProductController {
@@ -97,6 +99,59 @@ class ProductController {
         }
     }
 
+    async getMainPage(req, res) {
+        try {
+            const categories = await Category.findAll({where:{parentId:{ [sequelize.Op.not]: null }}})
+            const collections = await Collection.findAll({
+                where:{visible:true},
+                include:[
+                    {
+                        model:CollectionProducts,
+                        include:[
+                            {
+                                model:Product,
+                                include: [
+                                    ProductImages,
+                                    Category,
+                                    Manufacturer,
+                                    {
+                                        model: Review,
+                                        attributes: [],
+                                    },
+                                    {
+                                        model: OrderProducts,
+                                        attributes: [],
+                                    },
+                                ],
+                                attributes: {
+                                    include: [
+                                        [
+                                            sequelize.literal(
+                                                "(SELECT AVG(rate) FROM reviews WHERE reviews.productId = `collection_products.product.id`)"
+                                            ),
+                                            "avgReview",
+                                        ],
+                                        [
+                                            sequelize.literal(
+                                                "(SELECT COUNT(*) FROM order_products WHERE order_products.productId = `collection_products.product.id`)"
+                                            ),
+                                            "orders",
+                                        ],
+                                    ],
+                                },
+                            }
+                        ]
+                    }
+                ]
+            })
+            return sendResponse(res, 200, "success", { data: {title:'Главная страница',list:[{cards:categories,collections:collections}],totalPages:0}})
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
+        }
+    }
+
     async getAll(req, res) {
         try {
             let { limit, page, sort, sortmode, search, category } = req.query;
@@ -158,7 +213,7 @@ class ProductController {
                 return sendResponse(res, 400, "error", { message: errors });
             }
 
-            return sendResponse(res, 200, "success", { data: {list:productsList,totalPages:totalPages }})
+            return sendResponse(res, 200, "success", { data: {title:"Поиск",list:productsList,totalPages:totalPages }})
         } catch (e) {
             sendResponse(res, 500, "error", {
                 message: `Ошибка сервера - ${e}`,

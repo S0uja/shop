@@ -10,14 +10,14 @@ const OrderButton = (props) => {
     const UserInfo = useSelector(state => state.user.userInfo)
     const dispatch = useDispatch()
 
-    const handleClick = () => {
+    const handleClick = async () => {
         setLoading(true)
 
         if(!UserInfo.role){
             dispatch(setAuthModal(true))
             return setLoading(false)
         }
-
+        await props.onClick()
         return setLoading(false)
     }
 

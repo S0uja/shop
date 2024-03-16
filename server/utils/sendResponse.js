@@ -3,7 +3,7 @@ module.exports = (res, statusCode, statusText, {message=[], data=[]}) => {
         status: statusText,
         body: {
             message:message,
-            data:data
+            data:data,
         }
     });
 }
