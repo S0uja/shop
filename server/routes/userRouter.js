@@ -12,6 +12,7 @@ router.put('/update',authMiddleware,fileMiddleware.none(), UserController.update
 
 
 router.post('/admin/', fileMiddleware.none(), UserController.create)
+router.get('/admin/personal', UserController.getAllPersonal)
 router.get('/admin/', UserController.getAll)
 router.get('/admin/:id', UserController.getOne)
 router.put('/admin/:id',fileMiddleware.none(), UserController.updateAdmin)

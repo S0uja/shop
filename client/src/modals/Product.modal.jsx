@@ -64,10 +64,16 @@ const ProductModal = (props) => {
                   <Typography sx={{...font,fontSize:'28px', wordBreak:'break-all'}}>
                     {ProductInfo.name}
                   </Typography>
-
-                  <Typography sx={{...font,fontSize:'20px',color:'rgb(120, 120, 120)'}}>
-                    {ProductInfo.weight_volume}
-                  </Typography>
+                  <Box sx={{display:'flex',justifyContent:'start',gap:2,alignItems:'center'}}>
+                    <Typography sx={{...font,fontSize:'20px',color:'rgb(120, 120, 120)'}}>
+                      {ProductInfo.weight_volume}
+                    </Typography>
+                    
+                    <Typography sx={{...font,fontSize:'20px',color:'rgb(120, 120, 120)'}}>
+                      ★ {ProductInfo.avgReview || 0}
+                    </Typography>
+                  </Box>
+                  
 
                   <hr style={hr}/>
                   

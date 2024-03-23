@@ -1,6 +1,7 @@
 import { useEffect} from 'react'
 import { setCategories } from './store/categories.store'
 import Categories from './components/Categories.component'
+import { createTheme } from '@mui/material/styles';
 import Catalog from './components/Catalog.component'
 import { useDispatch } from 'react-redux'
 import { getAllCategories, getOneCategory } from './http/Categories.http'
@@ -25,6 +26,7 @@ import OrderModal from './modals/Order.modal'
 import ProfileModal from './modals/Profile.modal'
 import { setProducts, setCollections, setTotalPages, setPage, setCategory, setSearch, setSearchInput, setProductsLoading } from './store/products.store'
 import { getCart } from './http/Cart.http'
+import { useMediaQuery } from '@mui/material'
 
 export const App = () => {
 
@@ -33,22 +35,10 @@ export const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-
-        if (localStorage.getItem('token')) {
-          const userResponse = await userCheck();
-          if (userResponse) {
-            dispatch(setUserInfo(userResponse.data.data[0]))
-          }
-        }
         
-        const categoriesResponse = await getAllCategories()
-        if (categoriesResponse) {
-          dispatch(setCategories(categoriesResponse.data.data));
-        }
-  
         const searchParams = new URLSearchParams(window.location.search)
         const params = {}
-        if(searchParams.size){
+        if(searchParams.size>0){
           params.page = searchParams.get('page')
           params.search = searchParams.get('search') 
           params.category = searchParams.get('category') 
@@ -68,17 +58,16 @@ export const App = () => {
           dispatch(setSearchInput(params.search))
         }
 
-        if(!searchParams.size || !params.category && !params.search){
-          const mainPageResponse = await getMainPage()
-          dispatch(setCollections(mainPageResponse.data.data.list))
-          dispatch(setTotalPages(0))
-          dispatch(setProductsLoading(false))
+        if (localStorage.getItem('token')) {
+          const userResponse = await userCheck()
+          if (userResponse?.data) {
+            dispatch(setUserInfo(userResponse.data.data[0]))
+          }
         }
-        else{
-          const productsResponse = await getAllProducts(params?.page,params?.category,params?.search)
-          dispatch(setProducts(productsResponse.data.data.list))
-          dispatch(setTotalPages(productsResponse.data.data.totalPages))
-          dispatch(setProductsLoading(false))
+        
+        const categoriesResponse = await getAllCategories()
+        if (categoriesResponse) {
+          dispatch(setCategories(categoriesResponse.data.data));
         }
         
         const ordersResponse = await getAllOrders()
@@ -95,9 +84,10 @@ export const App = () => {
           const syncCart = await SyncCart(localCart)
           dispatch(setCart(syncCart))
         }
+
         else if(localStorage.getItem('token')) {
           const localCart = await getCart()
-          const syncCart = await SyncCart(localCart.data.data[0].json)
+          const syncCart = await SyncCart(localCart.data.data[0]?.json)
           dispatch(setCart(syncCart))
         }
 
@@ -118,7 +108,7 @@ export const App = () => {
       <CartModal />
       <CartFab/>
 
-      <Grid container maxWidth={'xxl'} columnSpacing={2} sx={{width:'100%',m:0,position:'relative'}}>
+      <Grid maxWidth={'xl'} container={true} disableEqualOverflow sx={{width: "100vw",px:1,pb:1,m:0,position:'relative',boxSizing:'border-box'}}>
         <Grid 
           es={12} xs={12} sm={12} md={12} lg={12} xl={12}
           sx={{width:'100%',display:{es:'block',xs:'block',sm:'block',md:'block',lg:'block',xl:'block'}}}
@@ -133,21 +123,21 @@ export const App = () => {
         </Grid>
 
         <Grid
-          es={0} xs={0} sm={0} md={3} lg={3} xl={2}
-          sx={{width:'100%',display:{es:'none',xs:'none',sm:'none',md:'block',lg:'block',xl:'block'}}}
+          es={0} xs={0} sm={0} md={3} lg={3} xl={2.5}
+          sx={{pr:2,width:'100%',display:{es:'none',xs:'none',sm:'none',md:'block',lg:'block',xl:'block'}}}
         >
           <Categories />
         </Grid>
 
         <Grid
-          es={12} xs={12} sm={12} md={9} lg={9} xl={7}
+          es={12} xs={12} sm={12} md={9} lg={9} xl={6.5}
         >
           <Catalog />
         </Grid>
 
         <Grid
           es={0} xs={0} sm={0} md={0} lg={0} xl={3}
-          sx={{display:{es:'none',xs:'none',sm:'none',md:'none',lg:'none',xl:'block'}}}
+          sx={{pl:2,display:{es:'none',xs:'none',sm:'none',md:'none',lg:'none',xl:'block'}}}
         >
           <Cart />
         </Grid>

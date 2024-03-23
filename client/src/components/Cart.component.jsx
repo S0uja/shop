@@ -96,7 +96,7 @@ const Cart = () => {
       top: 8,
     }}>
       <TabContext value={tab}>
-        <Box sx={{display:'flex',justifyContent:'center'}}>
+        <Box sx={{display:'flex',justifyContent:'center',mt:-1}}>
           <TabList onChange={handleChange} aria-label="lab API tabs example">
             <Tab label="Корзина" value="1" sx={{...font,fontSize:'12px'}}/>
             <Tab label="Данные заказа" value="2" sx={{...font,fontSize:'12px' }}/>

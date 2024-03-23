@@ -2,6 +2,8 @@ import {$authHost, $host} from "./index.http";
 
 export const getCart = async () => {
     try {
+        console.log('TRY GET CART');
+
         const {data} = await $authHost.get('api/cart/user', {timeout: 6000})
         
         return {status: data.status, data:data.body}
@@ -15,6 +17,7 @@ export const getCart = async () => {
 
 export const changeCart = async (json) => {
     try {
+        console.log('TRY CHANGE CART');
         const formdata = new FormData()
         formdata.append('json', json)
 

@@ -11,7 +11,7 @@ export const products = createSlice({
     category:null,
     sort:null,
     page:1,
-    totalPages:1,
+    totalPages:0,
     searchInput:''
   },
   reducers: {

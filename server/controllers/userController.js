@@ -9,6 +9,7 @@ const {
     ReviewStatus,
 } = require("../models/models");
 const bcrypt = require("bcrypt");
+const sequelize = require("sequelize");
 const sendResponse = require("../utils/sendResponse");
 const createJWT = require("../utils/createJWT");
 
@@ -160,6 +161,37 @@ class UserController {
                     "createdAt",
                     "updatedAt",
                 ],
+            });
+
+            if (!result) {
+                errors.push("Пользователи не найдены");
+            }
+            if (errors.length) {
+                return sendResponse(res, 200, "error", { message: errors });
+            }
+
+            return sendResponse(res, 200, "success", { data: result });
+        } catch (e) {
+            sendResponse(res, 500, "error", {
+                message: `Ошибка сервера - ${e}`,
+            });
+        }
+    }
+
+    async getAllPersonal(req, res) {
+        try {
+            const errors = [];
+            const result = await User.findAll({
+                attributes: [
+                    "id",
+                    "number",
+                    "fio",
+                    "birthdate",
+                    "role",
+                    "createdAt",
+                    "updatedAt",
+                ],
+                where:{role:{[sequelize.Op.not]: 'user'}}
             });
 
             if (!result) {
@@ -432,7 +464,7 @@ class UserController {
             await Cart.destroy({ where: { userId: id } });
             await User.destroy({ where: { id: id } });
 
-            return sendResponse(res, 200, "success");
+            return sendResponse(res, 200, "success",{});
         } catch (e) {
             sendResponse(res, 500, "error", {
                 message: `Ошибка сервера - ${e}`,

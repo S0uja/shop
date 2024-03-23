@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import font from '../themes/font.theme'
-import {List,ListItemButton,ListItemText,Collapse,ListItemAvatar,Avatar,Skeleton} from '@mui/material';
+import {List,ListItemButton,ListItemText,Collapse,ListItemAvatar,Avatar,Skeleton, Divider} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux'
 import {setCategory, setPage} from '../store/products.store'
 import { setProducts,setTotalPages } from '../store/products.store'
@@ -35,6 +35,9 @@ const Categories = () => {
                 p:2,
                 position:'sticky',
                 top: 8,
+                gap:1,
+                display:'flex',
+                flexDirection:'column'
             }}
             component="nav"
             aria-labelledby="nested-list-subheader"
@@ -51,7 +54,7 @@ const Categories = () => {
 
                     return (
                         <div key={index}>
-                            <ListItemButton key={index} sx={{borderRadius:2,p:1,mb:1}} onClick={() => handleOpen(category.id)}>
+                            <ListItemButton key={index} sx={{borderRadius:2,p:1}} onClick={() => handleOpen(category.id)}>
                                 <ListItemAvatar sx={{ minWidth: 40 }}>
                                     <Avatar 
                                         variant="rounded"
@@ -81,13 +84,14 @@ const Categories = () => {
                 })
                 :
                 <>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,mb:1,p:1 }}/>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{borderRadius:2,mb:1 }}/>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{borderRadius:2,mb:1 }}/>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{borderRadius:2,mb:1 }}/>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{borderRadius:2,mb:1 }}/>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{borderRadius:2,mb:1 }}/>
-                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{borderRadius:2,mb:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
+                    <Skeleton variant="rectangular" height={'45px'} width={'100%'} sx={{boxSizing:'border-box',borderRadius:2,p:1 }}/>
                 </>
             }
         </List>

@@ -44,25 +44,24 @@ const AuthModal = () => {
     const handleChangeTab = (event,value) => {
         setTab(value);
     }
-    const handlePhoneChange = (e) => {
-        let phoneNumber = e.target.value.replace(/\D/g, ''); // удаляем все символы, кроме цифр
-        phoneNumber = phoneNumber.slice(0, 11); // ограничиваем длину номера телефона
-        setSingUp(prevState => ({
-            ...prevState,
-            number: phoneNumber
-        }))
-        setSingIn(prevState => ({
-            ...prevState,
-            number: phoneNumber
-        }))
-    }
     const handleChangeSingUp = (attribute, value) => {
+
+        if(attribute==='number'){
+            value = value.replace(/\D/g, '')
+            value = value.slice(0, 11)
+        }
+
         setSingUp(prevState => ({
             ...prevState,
             [attribute]: value
         }));
     }
     const handleChangeSingIn = (attribute, value) => {
+        if(attribute==='number'){
+            value = value.replace(/\D/g, '')
+            value = value.slice(0, 11)
+        }
+
         setSingIn(prevState => ({
             ...prevState,
             [attribute]: value
@@ -292,7 +291,7 @@ const AuthModal = () => {
                                         variant="outlined"
                                         placeholder="+7 (___) ___-__-__"
                                         value={singIn.number}
-                                        onChange={handlePhoneChange}
+                                        onChange={(e) => handleChangeSingIn('number',e.target.value)}
                                         FormHelperTextProps={{
                                             style:  { 
                                               ...font,
@@ -343,9 +342,9 @@ const AuthModal = () => {
                                         }}
                                     />
                                 </Box>
-                                <Box >
-                                    <Button type="submit" onClick={login} disableElevation color="secondary" sx={{...font,height:'52px',color:'#fff',borderRadius:2,width:'100%'}} variant="contained">Войти</Button>
-                                </Box>
+
+                                <Button type="submit" onClick={login} disableElevation color="secondary" sx={{...font,height:'52px',color:'#fff',borderRadius:2,width:'100%'}} variant="contained">Войти</Button>
+                            
                             </Box>
                         </TabPanel>
 
@@ -361,7 +360,7 @@ const AuthModal = () => {
                                         variant="outlined"
                                         placeholder="+7 (___) ___-__-__"
                                         value={singIn.number}
-                                        onChange={handlePhoneChange}
+                                        onChange={(e) => handleChangeSingUp('number',e.target.value)}
                                         InputLabelProps={{
                                             style: {
                                                 ...font,

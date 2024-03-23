@@ -87,7 +87,7 @@ const Header = () => {
                             vertical: 'top',
                             horizontal: 'right',
                         }}
-                        sx={{mt:2}}
+                        sx={{mt:2,borderRadius:2}}
                     >
                         <List sx={{p:1}}>
                             <ListItem disablePadding>

@@ -8,15 +8,17 @@ import {
   RouterProvider,
   Navigate
 } from "react-router-dom";
+import Admin from './Admin'
+
 const router = createBrowserRouter([
+  {
+    path: '/admin',
+    element: <Admin/>,
+  },
   {
     path: "/",
     element: <App/>,
   },
-  // {
-  //   path: '*',
-  //   element: <Navigate to="/" replace />,
-  // }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

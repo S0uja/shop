@@ -54,11 +54,11 @@ export const userLogin = async (number, password) => {
 
 export const userCheck = async () => {
     try {
+        console.log('TRY AUTH');
         const {data} = await $authHost.get('api/user/auth',{timeout: 6000})
         if(data.status==='error'){
             return {status:'error', data:data.body}
         }
-        
         const jwt = jwtDecode(data.body.data[0])
 
         localStorage.setItem('token', data.body.data[0])

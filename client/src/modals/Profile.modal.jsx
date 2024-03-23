@@ -11,7 +11,12 @@ import {setAddresses} from '../store/user.store'
 import {userUpdate,userUpdatePassword} from '../http/User.http'
 import { setUserInfo } from '../store/user.store';
 import { setSnackbarModal } from '../store/modals.store';
-import LoadingButton from '@mui/lab/LoadingButton';
+import {LoadingButton} from '@mui/lab';
+import { setCart } from '../store/cart.store';
+import Tab from '@mui/material/Tab'
+import TabContext from '@mui/lab/TabContext'
+import TabList from '@mui/lab/TabList'
+import TabPanel from '@mui/lab/TabPanel'
 
 const ProfileModal = (props) => {
   const dispatch = useDispatch()
@@ -205,6 +210,14 @@ const ProfileModal = (props) => {
     }
   }
 
+  const handleOut = () => {
+    handleCloseProfileModal()
+    dispatch(setCart([]))
+    dispatch(setUserInfo({}))
+    localStorage.removeItem('cart')
+    localStorage.removeItem('token')
+  }
+
   return (
         <Modal
           aria-labelledby="transition-modal-title"
@@ -244,20 +257,23 @@ const ProfileModal = (props) => {
                 </Typography>
               </Box>
 
-              <Box sx={{display:'flex',justifyContent:'center',flexDirection:{es:'row',xs:'row',sm:'row',md:'column',lg:'column',xl:'column'}}}>
-                <Button variant="text" onClick={()=>setTab(1)} sx={{...font,textTransform:'none',justifyContent:'start',borderRadius:0,p:0,py:2,px:1,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'},borderBottom:(tab===1?'2px solid #404040':'2px solid rgba(0,0,0,0)')}}>
+              <Box sx={{display:'flex',gap:2,overflow:'auto',width:'100%',overflowX:'auto',flexDirection:{es:'row',xs:'row',sm:'row',md:'column',lg:'column',xl:'column'}}}>
+                <Box variant="text" onClick={()=>setTab(1)} sx={{...font,display:'flex',alignItems:'center',textTransform:'none',justifyContent:'start',borderRadius:0,p:1,px:2,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'},borderBottom:(tab===1?'2px solid #404040':'2px solid rgba(0,0,0,0)')}}>
                   Личные данные
-                </Button>
-                <Button variant="text" onClick={()=>setTab(2)} sx={{...font,textTransform:'none',justifyContent:'start',borderRadius:0,p:0,py:2,px:1,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'},borderBottom:(tab===2?'2px solid #404040':'2px solid rgba(0,0,0,0)')}}>
+                </Box>
+                <Box variant="text" onClick={()=>setTab(2)} sx={{...font,display:'flex',alignItems:'center',textTransform:'none',justifyContent:'start',borderRadius:0,p:1,px:2,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'},borderBottom:(tab===2?'2px solid #404040':'2px solid rgba(0,0,0,0)')}}>
                   Адреса
-                </Button>
-                <Button variant="text" onClick={()=>setTab(3)} sx={{...font,textTransform:'none',justifyContent:'start',borderRadius:0,p:0,py:2,px:1,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'},borderBottom:(tab===3?'2px solid #404040':'2px solid rgba(0,0,0,0)')}}>
+                </Box>
+                <Box variant="text" onClick={()=>setTab(3)} sx={{...font,display:'flex',alignItems:'center',textTransform:'none',justifyContent:'start',borderRadius:0,p:1,px:2,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'},borderBottom:(tab===3?'2px solid #404040':'2px solid rgba(0,0,0,0)')}}>
                   Безопасность
-                </Button>
+                </Box>
+                <Box variant="text" onClick={handleOut} sx={{...font,display:'flex',alignItems:'center',color:'#c62828',textTransform:'none',justifyContent:'start',borderRadius:0,p:1,px:2,fontSize:{es:'10px',xs:'11px',sm:'12px',md:'14px',lg:'14px',xl:'16px'}}}>
+                  Выйти 
+                </Box>
               </Box>
             </Box>
 
-            <Box sx={{boxSizing:'border-box',p:2,width:'100%',height:'100%',display:(tab===1?'flex':'none'),flexDirection:'column',justifyContent:'start'}}>
+            <Box sx={{boxSizing:'border-box',flexGrow:2,p:2,width:'100%',height:'100%',display:(tab===1?'flex':'none'),flexDirection:'column',justifyContent:'start'}}>
               <Typography sx={{...font,fontSize:'22px',mb:3,textAlign:'center',display:{es:'none',xs:'none',sm:'none',md:'block',lg:'block',xl:'block'}}}>Личные данные</Typography>
               
               <TextField 

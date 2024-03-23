@@ -79,8 +79,8 @@ const AutocompleteMap = (props) => {
         <YMaps
           query={{
             load: "package.full",
-            apikey: 'daacc1dd-d76e-494c-9bbe-a4ec74ba8d0b',
-            suggest_apikey: '5aa0030e-aed2-4fc3-8dbb-8e5529e9bbae'
+            apikey: `${import.meta.env.VITE_YANDEX_API_KEY}`,
+            suggest_apikey: `${import.meta.env.VITE_YANDEX_SUGGEST_API_KEY}`
           }}
         >
           <Map

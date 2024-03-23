@@ -11,10 +11,15 @@ export const modals = createSlice({
     snackbarMessage:'',
     orderModal:false,
     profileModal:false,
+    personalModal:false,
+    confirmModal:false,
   },
   reducers: {
     setProductModal: (state, action) => {
       state.productModal = action.payload
+    },
+    setConfirmModal: (state, action) => {
+      state.confirmModal = action.payload
     },
     setAuthModal: (state, action) => {
       state.authModal = action.payload
@@ -32,10 +37,13 @@ export const modals = createSlice({
     },
     setProfileModal:(state,action) => {
       state.profileModal = action.payload
-    }
+    },
+    setPersonalModal:(state,action) => {
+      state.personalModal = action.payload
+    },
   },
 })
 
-export const { setProductModal, setAuthModal, setSnackbarModal, setCartModal, setOrderModal, setProfileModal } = modals.actions
+export const { setConfirmModal, setPersonalModal, setProductModal, setAuthModal, setSnackbarModal, setCartModal, setOrderModal, setProfileModal } = modals.actions
 
 export default modals.reducer

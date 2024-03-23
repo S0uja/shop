@@ -144,6 +144,7 @@ class ProductController {
                     }
                 ]
             })
+
             return sendResponse(res, 200, "success", { data: {title:'Главная страница',list:[{cards:categories,collections:collections}],totalPages:0}})
         } catch (e) {
             sendResponse(res, 500, "error", {

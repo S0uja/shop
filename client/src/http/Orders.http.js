@@ -2,6 +2,7 @@ import {$authHost, $host} from "./index.http";
 
 export const getAllOrders = async () => {
     try {
+        console.log('TRY GET ALL ORDERS');
         const {data} = await $authHost.get('api/order/user',{timeout: 6000})
         if(data.status==='error'){
             return {status:'error', data:data.body}

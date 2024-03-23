@@ -32,11 +32,15 @@ const CardCategoryComponent = (props) => {
             },
             height:'auto',
             backgroundColor:'#eeeeee',
-            borderRadius:2
+            borderRadius:2,
+            cursor:'pointer'
           }}
           elevation={0}
+          onClick={()=>{
+            handleChangeCategory(props.name,props.id)
+          }}
         >
-          <CardContent sx={{p:1, cursor:'default'}}>
+          <CardContent sx={{p:1}}>
             <Typography gutterBottom variant="p" component="div" sx={{...font, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',lineHeight: '1.2em', height: '2.4em'}}>
               {props.name}
             </Typography>
@@ -45,13 +49,10 @@ const CardCategoryComponent = (props) => {
             component="img"
             sx={{
               aspectRatio: '1 / 1',
-              borderRadius:2,userSelect: 'none', userDrag: 'none', cursor:'pointer'
+              borderRadius:2,userSelect: 'none', userDrag: 'none'
             }}
             // image={import.meta.env.VITE_API_URL+props.image}
             image={import.meta.env.VITE_API_URL+'defaultProductImage.jpg'}
-            onClick={()=>{
-              handleChangeCategory(props.name,props.id)
-            }}
           />
         </Card>
     )
